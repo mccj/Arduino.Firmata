@@ -111,38 +111,38 @@ namespace Solid.Arduino.Run
             //var sss1 = session.GetBoardAnalogMapping();
             //session.RequestBoardAnalogMapping();
 
-            //////步进电机
-            //session.CreateStepperMoveCompleteMonitor().Subscribe(new eeee3("步进完成"));
-            //session.CreateStepperPositionMonitor().Subscribe(new eeee3("步进汇报"));
-            //session.StepperConfiguration(0, new DeviceConfig
-            //{
-            //    MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
-            //    StepOrPin1Number = 26,
-            //    DirectionOrPin2Number = 28,
-            //    EnablePinNumber = 24,
-            //    InvertEnablePinNumber = true
-            //});
-            //session.StepperEnable(0, true);
-            //session.StepperEnable(0, false);
-            //session.StepperSetSpeed(0, 32767);
-            //session.StepperSetScceleration(0, 5000);
-            //session.请求报告步进位置(0);
-            //Console.ReadKey(true);
-            //session.StepperMove(0, 10000);
-            //Console.ReadKey(true);
-            //session.StepperMove(0, -10000);
-            //Console.ReadKey(true);
-            //session.StepperEnable(0, true);
+            ////步进电机
+            session.CreateStepperMoveCompleteMonitor().Subscribe(new eeee3("步进完成"));
+            session.CreateStepperPositionMonitor().Subscribe(new eeee3("步进汇报"));
+            session.StepperConfiguration(0, new DeviceConfig
+            {
+                MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
+                StepOrPin1Number = 26,
+                DirectionOrPin2Number = 28,
+                EnablePinNumber = 24,
+                InvertEnablePinNumber = true
+            });
+            session.StepperEnable(0, true);
+            session.StepperEnable(0, false);
+            session.StepperSetSpeed(0, 32767);
+            session.StepperSetScceleration(0, 5000);
+            var ss = session.请求报告步进位置(0);
+            Console.ReadKey(true);
+            session.StepperMove(0, 10000);
+            Console.ReadKey(true);
+            session.StepperMove(0, -10000);
+            Console.ReadKey(true);
+            session.StepperEnable(0, true);
 
-            //Console.ReadKey(true);
+            Console.ReadKey(true);
 
 
-            //var cap = session.GetBoardCapability();//开发板引脚支持的功能
-            //foreach (var pincap in cap.Pins.Where(c => (c.DigitalInput || c.DigitalOutput) && !c.Analog))
-            //{
-            //    var pinState = session.GetPinState(pincap.PinNumber);//获取数字引脚状态
-            //    Console.WriteLine("引脚(Pin) {0}: 模式(Mode) = {1}, 值(Value) = {2}", pincap.PinNumber, pinState.Mode, pinState.Value);
-            //}
+            var cap = session.GetBoardCapability();//开发板引脚支持的功能
+            foreach (var pincap in cap.Pins.Where(c => (c.DigitalInput || c.DigitalOutput) && !c.Analog))
+            {
+                var pinState = session.GetPinState(pincap.PinNumber);//获取数字引脚状态
+                Console.WriteLine("引脚(Pin) {0}: 模式(Mode) = {1}, 值(Value) = {2}", pincap.PinNumber, pinState.Mode, pinState.Value);
+            }
 
 
             ////伺服电机
@@ -312,7 +312,7 @@ namespace Solid.Arduino.Run
 
         static void SimpelTest(IDataConnection connection)
         {
-            var session = new ArduinoSession(connection, timeOut: 2500);
+            var session = new ArduinoSession(connection, timeOut: 5000);
             var firmata = session;
 
             firmata.EvintFirmata().AnalogStateReceived += Session_OnAnalogStateReceived;//接收到模拟引脚状态
