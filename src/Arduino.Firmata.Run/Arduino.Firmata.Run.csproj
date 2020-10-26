@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<!--<TargetFrameworks>netcoreapp2.1;net461</TargetFrameworks>
+	  <TargetFrameworks>netcoreapp2.1</TargetFrameworks>-->
+		<TargetFrameworks>net461</TargetFrameworks>
+
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Arduino.Firmata.Connection.Serial\Arduino.Firmata.Connection.Serial.csproj" />
+	</ItemGroup>
+
+</Project>

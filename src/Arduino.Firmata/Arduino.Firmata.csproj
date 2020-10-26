@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
+		<LangVersion>8.0</LangVersion>
+		<!--<VersionSuffix>1.0.2.0-Beta-$([System.DateTime]::UtcNow.ToString(yyyyMMddHHmmssffff))</VersionSuffix>
+		<Version Condition=" '$(VersionSuffix)' == '' ">1.0.2.0</Version>
+		<Version Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)</Version>-->
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Update="Messages.Designer.cs">
+			<DependentUpon>Messages.resx</DependentUpon>
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Messages.resx">
+			<LastGenOutput>Messages.Designer.cs</LastGenOutput>
+			<Generator>ResXFileCodeGenerator</Generator>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Protocol\serial\" />
+	</ItemGroup>
+</Project>
