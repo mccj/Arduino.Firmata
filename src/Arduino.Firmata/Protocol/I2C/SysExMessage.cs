@@ -61,23 +61,5 @@ namespace Solid.Arduino.Firmata
 
             return new FirmataMessage<I2CReply>(reply);
         }
-        private IFirmataMessage CreateFirmwareResponse(MessageHeader messageHeader)
-        {
-            var firmware = new Firmware
-            {
-                MajorVersion = messageHeader._messageBuffer[2],
-                MinorVersion = messageHeader._messageBuffer[3]
-            };
-
-            var builder = new StringBuilder(messageHeader._messageBufferIndex);
-
-            for (int x = 4; x < messageHeader._messageBufferIndex; x += 2)
-            {
-                builder.Append((char)(messageHeader._messageBuffer[x] | (messageHeader._messageBuffer[x + 1] << 7)));
-            }
-
-            firmware.Name = builder.ToString();
-            return new FirmataMessage<Firmware>(firmware);
-        }
     }
 }

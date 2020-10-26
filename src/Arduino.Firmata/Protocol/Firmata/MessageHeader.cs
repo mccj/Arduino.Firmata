@@ -165,13 +165,16 @@ namespace Solid.Arduino.Firmata
             var sysExMessage = new ISysExMessage[] {
                 new SysExMessage(),
                 new I2CSysExMessage(),
+                new StringSysExMessage(),
                 new AccelStepperSysExMessage()
                 };
             foreach (var item in sysExMessage)
             {
                 if (item.CanHeader((byte)_messageHeader._messageBuffer[1]))
+                {
                     DeliverMessage(item.Header(_messageHeader));
-                return;
+                    return;
+                }
             }
             throw new NotImplementedException();
 
