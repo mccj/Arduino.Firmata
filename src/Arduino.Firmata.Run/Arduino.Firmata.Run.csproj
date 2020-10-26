@@ -9,7 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Arduino.Firmata.Connection.Serial\Arduino.Firmata.Connection.Serial.csproj" />
+	  <ProjectReference Include="..\Arduino.Firmata.Serial\Arduino.Firmata.Serial.csproj" />
 	</ItemGroup>
 
 </Project>

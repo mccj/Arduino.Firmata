@@ -312,7 +312,7 @@ namespace Solid.Arduino.Run
 
         static void SimpelTest(IDataConnection connection)
         {
-            var session = new ArduinoSession(connection, timeOut: 5000);
+            var session = new ArduinoSession(connection, timeOut: 2500);
             var firmata = session;
 
             firmata.EvintFirmata().AnalogStateReceived += Session_OnAnalogStateReceived;//接收到模拟引脚状态

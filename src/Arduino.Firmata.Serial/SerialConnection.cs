@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using Arduino.Firmata.Serial;
 #if NETSTANDARD
 using SerialPort = RJCP.IO.Ports.SerialPortStream;
 using SerialDataReceivedEventArgs=RJCP.IO.Ports.SerialDataReceivedEventArgs;

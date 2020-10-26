@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Arduino.Firmata.Connection.Serial {
+namespace Arduino.Firmata.Serial {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Arduino.Firmata.Connection.Serial {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Arduino.Firmata.Connection.Serial.Messages", typeof(Messages).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Arduino.Firmata.Serial.Messages", typeof(Messages).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
