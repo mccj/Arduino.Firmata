@@ -1,11 +1,5 @@
-﻿using System;
-using System.IO.Ports;
-using System.Runtime.CompilerServices;
-using System.Threading;
-using Arduino.Firmata.Connection.Serial;
+﻿using Arduino.Firmata.Serial;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using Solid.Arduino;
 
 namespace Solid.Arduino.IntegrationTest
 {

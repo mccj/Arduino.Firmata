@@ -1,4 +1,4 @@
-﻿namespace Solid.Arduino.Firmata
+﻿namespace Arduino.Firmata.Protocol.Firmata
 {
     /// <summary>
     /// Represents the analog level read from or set to an analog pin.

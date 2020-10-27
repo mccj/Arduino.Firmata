@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Solid.Arduino.Firmata
+namespace Arduino.Firmata
 {
     /// <summary>
     /// Defines a serial port connection.

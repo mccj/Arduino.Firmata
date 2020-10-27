@@ -1,11 +1,6 @@
-﻿using Arduino.Firmata;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
 
-namespace Solid.Arduino.Firmata
+namespace Arduino.Firmata
 {
     /// <summary>
     /// Provides extension methods for <see cref="byte"/> arrays.

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Solid.Arduino
+namespace Arduino.Firmata
 {
     internal abstract class ObservableEventTracker<TSource, TTracked> : IObservable<TTracked>, IDisposable
     {

@@ -1,14 +1,6 @@
-﻿using Arduino.Firmata;
-using Solid.Arduino.Firmata;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using System.Linq;
 
-namespace Solid.Arduino
+namespace Arduino.Firmata.Protocol.String
 {
     /// <summary>
     /// Signature of event handlers capable of processing received strings.

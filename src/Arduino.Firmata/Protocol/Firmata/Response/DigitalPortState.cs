@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Solid.Arduino.Firmata
+namespace Arduino.Firmata.Protocol.Firmata
 {
     /// <summary>
     /// Represents the pin states of a digital port.

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Solid.Arduino.I2C
+﻿namespace Arduino.Firmata.Protocol.I2C
 {
     /// <summary>
     /// Container for an I2C message

@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
+﻿using Arduino.Firmata;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using Solid.Arduino.Firmata;
-using System.Threading.Tasks;
+using System;
+using System.Collections.Generic;
 
 namespace Solid.Arduino.Test
 {

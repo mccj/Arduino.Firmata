@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Solid.Arduino.Firmata
+namespace Arduino.Firmata
 {
     /// <inheritdoc />
     public class FirmataMessage<T> : IFirmataMessage

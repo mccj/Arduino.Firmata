@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Arduino.Firmata;
+using Arduino.Firmata.Extend;
+using Arduino.Firmata.Protocol.I2C;
 using System.Threading.Tasks;
-using Arduino.Firmata;
-using Solid.Arduino.Firmata;
-using Solid.Arduino.I2C;
 
-namespace Solid.Arduino
+namespace System.Linq
 {
     /// <summary>
     /// Defines a comprehensive set of members supporting the I2C Protocol.

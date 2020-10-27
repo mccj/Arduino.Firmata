@@ -1,14 +1,7 @@
-﻿using Arduino.Firmata;
-using Solid.Arduino.I2C;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System;
 using System.Linq;
-using System.Text;
-using System.Threading;
 
-namespace Solid.Arduino.Firmata
+namespace Arduino.Firmata.Protocol.I2C
 {
     /// <summary>
     /// Defines a serial port connection.

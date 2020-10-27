@@ -1,21 +1,17 @@
-﻿using Solid.Arduino;
-using Solid.Arduino.Firmata;
-//using Solid.Arduino.Serial;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using Arduino.Firmata.Serial;
 #if NETSTANDARD
 using SerialPort = RJCP.IO.Ports.SerialPortStream;
-using SerialDataReceivedEventArgs=RJCP.IO.Ports.SerialDataReceivedEventArgs;
+using SerialDataReceivedEventArgs = RJCP.IO.Ports.SerialDataReceivedEventArgs;
 #else
 using SerialPort = System.IO.Ports.SerialPort;
 using SerialDataReceivedEventArgs = System.IO.Ports.SerialDataReceivedEventArgs;
 #endif
 
-namespace Arduino.Firmata.Connection.Serial
+namespace Arduino.Firmata.Serial
 {
     public class SerialConnection : IDataConnection
     {
@@ -48,14 +44,14 @@ namespace Arduino.Firmata.Connection.Serial
         /// <summary>
         /// Initializes a new instance of <see cref="EnhancedSerialConnection"/> class using the highest serial port available at 115,200 bits per second.
         /// </summary>
-        public SerialConnection() : this(GetLastPortName(), (int)Solid.Arduino.SerialBaudRate.Bps_115200) { }
+        public SerialConnection() : this(GetLastPortName(), (int)SerialBaudRate.Bps_115200) { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="EnhancedSerialConnection"/> class on the given serial port and at the given baud rate.
         /// </summary>
         /// <param name="portName">The port name (e.g. 'COM3')</param>
         /// <param name="baudRate">The baud rate</param>
-        public SerialConnection(string portName, Solid.Arduino.SerialBaudRate baudRate) : this(portName, (int)baudRate) { }
+        public SerialConnection(string portName, SerialBaudRate baudRate) : this(portName, (int)baudRate) { }
 
         /// <summary>
         /// Initializes a new instance of <see cref="MicrosoftSerialConnection"/> class on the given serial port and at the given baud rate.
@@ -79,7 +75,7 @@ namespace Arduino.Firmata.Connection.Serial
         #region Public Methods & Properties
 
         public int InfiniteTimeout => SerialPort.InfiniteTimeout;
-        public event Solid.Arduino.Firmata.DataReceivedEventHandler DataReceived;
+        public event DataReceivedEventHandler DataReceived;
         public string Name => _serial.PortName;
         public string PortName => _serial.PortName;
         public int BaudRate => _serial.BaudRate;
@@ -107,7 +103,7 @@ namespace Arduino.Firmata.Connection.Serial
                 // NOPE: RawDump on Rpi shows that data is correctly received, so no buffers are "remembered".
 
 #if NETSTANDARD
-  _serial.Flush();
+                _serial.Flush();
 #endif
                 _serial.DiscardOutBuffer();
                 _serial.DiscardInBuffer();
@@ -191,7 +187,7 @@ namespace Arduino.Firmata.Connection.Serial
         {
             Func<ArduinoSession, bool> isAvailableFunc = session =>
             {
-                Firmware firmware = session.GetFirmware();
+                var firmware = session.GetFirmware();
                 return firmware.MajorVersion >= 2;
             };
 
@@ -274,7 +270,7 @@ namespace Arduino.Firmata.Connection.Serial
             DataReceived?.Invoke(sender/*, new SerialDataReceivedEventArgs((SerialData)e.EventType)*/);
         }
 
-        private static IDataConnection FindConnection(Func<ArduinoSession, bool> isDeviceAvailable, string[] portNames, Solid.Arduino.SerialBaudRate[] baudRates)
+        private static IDataConnection FindConnection(Func<ArduinoSession, bool> isDeviceAvailable, string[] portNames, SerialBaudRate[] baudRates)
         {
             bool found = false;
 

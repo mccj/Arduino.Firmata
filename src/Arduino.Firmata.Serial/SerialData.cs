@@ -1,4 +1,4 @@
-﻿//namespace Solid.Arduino.Serial
+﻿//namespace Arduino.Firmata.Serial
 //{
 //  // <summary>Specifies the type of character that was received on the serial port of the <see cref="T:System.IO.Ports.SerialPort" /> object.</summary>
 //  public enum SerialData

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Solid.Arduino
+﻿namespace Arduino.Firmata.Protocol.String
 {
     internal class ReceivedStringTracker : ObservableEventTracker<StringEvint, string>
     {

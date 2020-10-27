@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Solid.Arduino.Firmata
+﻿namespace Arduino.Firmata.Protocol.String
 {
     /// <summary>
     /// Represents a string exchanged with the Firmata SYSEX STRING_DATA command.

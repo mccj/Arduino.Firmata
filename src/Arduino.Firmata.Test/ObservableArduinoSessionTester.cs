@@ -13,7 +13,7 @@ namespace Solid.Arduino.Test
         [TestMethod]
         public void TestMethod1()
         {
-            var x = new Firmata.ArduinoSession(new MockSerialConnection());
+            var x = new ArduinoSession(new MockSerialConnection());
 
             var tracker = x.CreateAnalogStateMonitor();
             

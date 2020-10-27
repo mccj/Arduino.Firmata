@@ -1,9 +1,6 @@
-﻿using Solid.Arduino.Firmata;
-using System;
-using System.Threading.Tasks;
-using static Solid.Arduino.Firmata.MessageHeader;
+﻿using System;
 
-namespace Arduino.Firmata
+namespace Arduino.Firmata.Extend
 {
     public static class Develop
     {
@@ -24,51 +21,7 @@ namespace Arduino.Firmata
         {
             session.Connection.WriteLine(value);
         }
-        /// <inheritdoc cref="IStringProtocol.ReadLine"/>
-        public static string ReadLine(this ArduinoSession session)
-        {
-            return session.messageHeader. GetStringFromQueue(StringRequest.CreateReadLineRequest());
-        }
-
-        /// <inheritdoc cref="IStringProtocol.ReadLineAsync"/>
-        public static async Task<string> ReadLineAsync(this ArduinoSession session)
-        {
-            return await Task.Run(() => session.messageHeader.GetStringFromQueue(StringRequest.CreateReadLineRequest()));
-        }
-
-        /// <inheritdoc cref="IStringProtocol.Read"/>
-        public static string Read(this ArduinoSession session, int length = 1)
-        {
-            if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), Messages.ArgumentEx_PositiveValue);
-
-            return session.messageHeader.GetStringFromQueue(StringRequest.CreateReadRequest(length));
-        }
         
-        /// <inheritdoc cref="IStringProtocol.ReadAsync"/>
-        public static async Task<string> ReadAsync(this ArduinoSession session, int length = 1)
-        {
-            if (length < 0)
-                throw new ArgumentOutOfRangeException(nameof(length), Messages.ArgumentEx_PositiveValue);
-
-            return await Task.Run(() => session.messageHeader.GetStringFromQueue(StringRequest.CreateReadRequest(length)));
-        }
-
-        /// <inheritdoc cref="IStringProtocol.ReadTo"/>
-        public static string ReadTo(this ArduinoSession session, char terminator = char.MinValue)
-        {
-            return session.messageHeader.GetStringFromQueue(StringRequest.CreateReadRequest(terminator));
-        }
-
-        /// <inheritdoc cref="IStringProtocol.ReadToAsync"/>
-        public static async Task<string> ReadToAsync(this ArduinoSession session, char terminator = char.MinValue)
-        {
-            return await Task.Run(() => session.messageHeader.GetStringFromQueue(StringRequest.CreateReadRequest(terminator)));
-        }
-
-
-
-
         public static void SendSysExCommand(this ArduinoSession session, byte command)
         {
             var message = new[]

@@ -1,16 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-//using Solid.Arduino.I2C;
-//using Solid.Arduino.Firmata.Servo;
-//using Solid.Arduino.Firmata;
 
-namespace Solid.Arduino.Firmata
+namespace Arduino.Firmata
 {
 
     /// <summary>

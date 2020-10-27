@@ -1,11 +1,8 @@
 ﻿using Arduino.Firmata;
-using System;
-using System.Collections.Generic;
+using Arduino.Firmata.Extend;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Solid.Arduino.Firmata.Servo
+namespace System.Linq
 {
     /// <summary>
     /// Defines Servo control related members of the Firmata protocol.

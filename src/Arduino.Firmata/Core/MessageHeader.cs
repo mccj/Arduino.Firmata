@@ -1,12 +1,11 @@
-﻿using Arduino.Firmata;
+﻿using Arduino.Firmata.Protocol.Firmata;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
-namespace Solid.Arduino.Firmata
+namespace Arduino.Firmata
 {
     /// <summary>
     /// Defines a serial port connection.

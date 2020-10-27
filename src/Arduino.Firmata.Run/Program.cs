@@ -1,5 +1,7 @@
 ﻿using Arduino.Firmata;
-using Solid.Arduino.Firmata;
+using Arduino.Firmata.Protocol.AccelStepper;
+using Arduino.Firmata.Protocol.Firmata;
+using Arduino.Firmata.Serial;
 using System;
 using System.Linq;
 using System.Threading;
@@ -29,7 +31,7 @@ namespace Solid.Arduino.Run
         private static IDataConnection GetConnection()
         {
             Console.WriteLine("正在搜索Arduino连接...");
-            var connection = new global::Arduino.Firmata.Connection.Serial.SerialConnection("COM4", 57600);
+            var connection = new SerialConnection("COM4", 57600);
 
             //EnhancedSerialConnection.Find();
 

@@ -1,7 +1,6 @@
 ﻿//using System;
-//using Solid.Arduino.Firmata;
 
-//namespace Solid.Arduino.Serial
+//namespace Arduino.Firmata.Serial
 //{
 //  /// <summary>Provides data for the <see cref="E:System.IO.Ports.SerialPort.DataReceived" /> event.</summary>
 //  public class SerialDataReceivedEventArgs : DataReceivedEventArgs

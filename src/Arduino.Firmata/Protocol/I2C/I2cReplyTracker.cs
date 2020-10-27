@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Solid.Arduino.I2C
+﻿namespace Arduino.Firmata.Protocol.I2C
 {
     internal class I2CReplyTracker : ObservableEventTracker<I2CEvint, I2CReply>
     {

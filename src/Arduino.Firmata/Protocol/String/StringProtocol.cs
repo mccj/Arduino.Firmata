@@ -1,10 +1,9 @@
 ﻿using Arduino.Firmata;
-using Solid.Arduino.Firmata;
-using System;
+using Arduino.Firmata.Protocol.String;
 using System.Threading.Tasks;
-using static Solid.Arduino.Firmata.MessageHeader;
+using static Arduino.Firmata.MessageHeader;
 
-namespace Solid.Arduino
+namespace System.Linq
 {
     /// <summary>
     /// Defines members for sending and receiving ASCII string messages.
@@ -107,6 +106,51 @@ namespace Solid.Arduino
         {
             return await Task.Run(() => session.messageHeader.GetStringFromQueue(StringRequest.CreateReadRequest(terminator)));
         }
+
+
+
+
+        ///// <inheritdoc cref="IStringProtocol.ReadLine"/>
+        //public static string ReadLine(this ArduinoSession session)
+        //{
+        //    return session.messageHeader.GetStringFromQueue(StringRequest.CreateReadLineRequest());
+        //}
+
+        ///// <inheritdoc cref="IStringProtocol.ReadLineAsync"/>
+        //public static async Task<string> ReadLineAsync(this ArduinoSession session)
+        //{
+        //    return await Task.Run(() => session.messageHeader.GetStringFromQueue(StringRequest.CreateReadLineRequest()));
+        //}
+
+        ///// <inheritdoc cref="IStringProtocol.Read"/>
+        //public static string Read(this ArduinoSession session, int length = 1)
+        //{
+        //    if (length < 0)
+        //        throw new ArgumentOutOfRangeException(nameof(length), Messages.ArgumentEx_PositiveValue);
+
+        //    return session.messageHeader.GetStringFromQueue(StringRequest.CreateReadRequest(length));
+        //}
+
+        ///// <inheritdoc cref="IStringProtocol.ReadAsync"/>
+        //public static async Task<string> ReadAsync(this ArduinoSession session, int length = 1)
+        //{
+        //    if (length < 0)
+        //        throw new ArgumentOutOfRangeException(nameof(length), Messages.ArgumentEx_PositiveValue);
+
+        //    return await Task.Run(() => session.messageHeader.GetStringFromQueue(StringRequest.CreateReadRequest(length)));
+        //}
+
+        ///// <inheritdoc cref="IStringProtocol.ReadTo"/>
+        //public static string ReadTo(this ArduinoSession session, char terminator = char.MinValue)
+        //{
+        //    return session.messageHeader.GetStringFromQueue(StringRequest.CreateReadRequest(terminator));
+        //}
+
+        ///// <inheritdoc cref="IStringProtocol.ReadToAsync"/>
+        //public static async Task<string> ReadToAsync(this ArduinoSession session, char terminator = char.MinValue)
+        //{
+        //    return await Task.Run(() => session.messageHeader.GetStringFromQueue(StringRequest.CreateReadRequest(terminator)));
+        //}
 
 
         public static StringEvint EvintString(this ArduinoSession session)

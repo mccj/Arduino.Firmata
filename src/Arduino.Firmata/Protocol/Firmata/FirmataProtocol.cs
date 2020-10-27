@@ -1,8 +1,9 @@
-﻿using Solid.Arduino.Firmata;
-using System;
+﻿using Arduino.Firmata;
+using Arduino.Firmata.Extend;
+using Arduino.Firmata.Protocol.Firmata;
 using System.Threading.Tasks;
 
-namespace Arduino.Firmata
+namespace System.Linq
 {
     /// <summary>
     /// Defines a comprehensive set of members supporting the Firmata Protocol.

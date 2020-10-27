@@ -1,4 +1,4 @@
-﻿namespace Solid.Arduino.Firmata
+﻿namespace Arduino.Firmata.Protocol.Firmata
 {
     /// <summary>
     /// Represents a mapping between a MIDI channel and a physical pin number.

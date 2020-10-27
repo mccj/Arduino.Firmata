@@ -1,4 +1,4 @@
-namespace Solid.Arduino
+namespace Arduino.Firmata.Serial
 {
     /// <summary>
     /// Enumeration of common baud rates, supported by Arduino boards

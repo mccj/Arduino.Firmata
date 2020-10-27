@@ -1,13 +1,6 @@
-﻿using Arduino.Firmata;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading;
+﻿using Arduino.Firmata.Protocol.Firmata;
 
-namespace Solid.Arduino.Firmata
+namespace Arduino.Firmata.Protocol.AccelStepper
 {
     /// <summary>
     /// Signature of event handlers capable of processing analog I/O messages.

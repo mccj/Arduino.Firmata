@@ -1,13 +1,9 @@
-﻿using System;
+﻿using Arduino.Firmata;
+using Arduino.Firmata.Protocol.Firmata;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Arduino.Firmata;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using Solid.Arduino.Firmata;
-using Solid.Arduino.Firmata.Servo;
 //using Solid.Arduino.I2C;
 
 namespace Solid.Arduino.Test

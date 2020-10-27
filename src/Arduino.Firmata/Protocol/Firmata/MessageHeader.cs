@@ -1,9 +1,12 @@
-﻿using Arduino.Firmata;
+﻿using Arduino.Firmata.Extend;
+using Arduino.Firmata.Protocol.AccelStepper;
+using Arduino.Firmata.Protocol.I2C;
+using Arduino.Firmata.Protocol.String;
 using System;
 using System.Linq;
 using System.Threading;
 
-namespace Solid.Arduino.Firmata
+namespace Arduino.Firmata.Protocol.Firmata
 {
     /// <summary>
     /// Defines a serial port connection.
@@ -155,7 +158,7 @@ namespace Solid.Arduino.Firmata
 
         private static void ProcessSysExMessage(int messageByte)
         {
-            if (messageByte != global::Arduino.Firmata.Utility.SysExEnd)
+            if (messageByte != Utility.SysExEnd)
             {
                 _messageHeader.WriteMessageByte(messageByte);
                 return;

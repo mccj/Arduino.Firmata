@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Solid.Arduino.Firmata
+namespace Arduino.Firmata
 {
     /// <summary>
     /// Event arguments passed to a <see cref="MessageReceivedHandler"/> type event.

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Solid.Arduino.Firmata
+﻿namespace Arduino.Firmata.Protocol.Firmata
 {
     internal class DigitalStateTracker : ObservableEventTracker<FirmataEvint, DigitalPortState>
     {

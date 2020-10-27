@@ -1,9 +1,7 @@
 ﻿using Arduino.Firmata;
-using Solid.Arduino;
-using Solid.Arduino.Firmata;
-using System;
+using Arduino.Firmata.Extend;
+using Arduino.Firmata.Protocol.AccelStepper;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Threading.Tasks;
 
 namespace System.Linq
@@ -397,7 +395,7 @@ namespace System.Linq
 
 
 
-        public static long decode32BitSignedInteger(byte arg1, byte arg2, byte arg3, byte arg4, byte arg5)
+        internal static long decode32BitSignedInteger(byte arg1, byte arg2, byte arg3, byte arg4, byte arg5)
         {
             long result = (long)arg1 | (long)arg2 << 7 | (long)arg3 << 14 | (long)arg4 << 21 | (((long)arg5 << 28) & 0x07);
 

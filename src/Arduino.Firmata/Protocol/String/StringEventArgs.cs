@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Solid.Arduino
+﻿namespace Arduino.Firmata.Protocol.String
 {
     /// <summary>
     /// Event arguments passed to a <see cref="StringReceivedHandler"/> type event.

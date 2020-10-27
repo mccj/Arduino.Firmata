@@ -1,11 +1,6 @@
-﻿using System;
-using System.Text;
-using System.Collections.Generic;
-
+﻿using Arduino.Firmata.Protocol.Firmata;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-
-using Solid.Arduino;
-using Solid.Arduino.Firmata;
+using System;
 
 namespace Solid.Arduino.Test
 {

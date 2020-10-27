@@ -1,4 +1,4 @@
-﻿namespace Solid.Arduino.Firmata
+﻿namespace Arduino.Firmata.Protocol.Firmata
 {
     /// <summary>
     /// Represents a summary of pinmode capabilities supported by an Arduino board.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Solid.Arduino.Firmata
+namespace Arduino.Firmata
 {
     /// <summary>
     /// Represents a Firmata message received from an Arduino or Arduino compatible system.

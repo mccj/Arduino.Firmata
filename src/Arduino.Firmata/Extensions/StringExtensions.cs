@@ -1,8 +1,7 @@
-﻿using Arduino.Firmata;
-using System;
+﻿using System;
 using System.Linq;
 
-namespace Solid.Arduino
+namespace Arduino.Firmata
 {
     /// <summary>
     /// Provides extension methods for <see cref="String"/> objects.

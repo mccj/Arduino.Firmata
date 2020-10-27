@@ -1,7 +1,4 @@
-﻿using Solid.Arduino.Firmata;
-using System;
-
-namespace Arduino.Firmata
+﻿namespace Arduino.Firmata.Extend
 {
     public static class Utility
     {

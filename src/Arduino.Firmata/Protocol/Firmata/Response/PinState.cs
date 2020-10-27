@@ -1,6 +1,6 @@
-﻿using Arduino.Firmata;
+﻿using System.Linq;
 
-namespace Solid.Arduino.Firmata
+namespace Arduino.Firmata.Protocol.Firmata
 {
     /// <summary>
     /// Contains information about a pin's state.

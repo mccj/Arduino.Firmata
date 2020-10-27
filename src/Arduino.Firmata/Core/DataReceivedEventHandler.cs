@@ -1,4 +1,4 @@
-﻿namespace Solid.Arduino.Firmata
+﻿namespace Arduino.Firmata
 {
     /// <summary>
     /// Represents the method that will handle the <see cref="IDataConnection.DataReceived" /> event of a <see cref="IDataConnection" /> object.
