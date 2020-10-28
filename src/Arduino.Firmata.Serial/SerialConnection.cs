@@ -6,9 +6,11 @@ using System.Threading;
 #if NETSTANDARD
 using SerialPort = RJCP.IO.Ports.SerialPortStream;
 using SerialDataReceivedEventArgs = RJCP.IO.Ports.SerialDataReceivedEventArgs;
+using SerialErrorReceivedEventArgs = RJCP.IO.Ports.SerialErrorReceivedEventArgs;
 #else
 using SerialPort = System.IO.Ports.SerialPort;
 using SerialDataReceivedEventArgs = System.IO.Ports.SerialDataReceivedEventArgs;
+using SerialErrorReceivedEventArgs = System.IO.Ports.SerialErrorReceivedEventArgs;
 #endif
 
 namespace Arduino.Firmata.Serial
@@ -69,7 +71,10 @@ namespace Arduino.Firmata.Serial
             _serial.WriteTimeout = DefaultTimeoutMs;
 
             _serial.DataReceived += OnSerialPortDataReceived;
+            _serial.ErrorReceived += OnSerialPortErrorReceived;
+
         }
+
         #endregion
 
         #region Public Methods & Properties
@@ -139,6 +144,7 @@ namespace Arduino.Firmata.Serial
 
             _isDisposed = true;
             _serial.DataReceived -= OnSerialPortDataReceived;
+            _serial.ErrorReceived -= OnSerialPortErrorReceived;
 
             _serial.Dispose();
             GC.SuppressFinalize(this);
@@ -269,7 +275,10 @@ namespace Arduino.Firmata.Serial
         {
             DataReceived?.Invoke(sender/*, new SerialDataReceivedEventArgs((SerialData)e.EventType)*/);
         }
-
+        private void OnSerialPortErrorReceived(object sender, SerialErrorReceivedEventArgs e)
+        {
+            throw new Exception("串口异常");
+        }
         private static IDataConnection FindConnection(Func<ArduinoSession, bool> isDeviceAvailable, string[] portNames, SerialBaudRate[] baudRates)
         {
             bool found = false;
