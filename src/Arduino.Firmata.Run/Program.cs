@@ -18,8 +18,8 @@ namespace Solid.Arduino.Run
 
 
             var connection = GetConnection();
-            SimpelTest(connection);
-
+            //SimpelTest(connection);
+            StepperTest(connection);
             //if (connection != null)
             //    using (var session = new ArduinoSession(connection))
             //        PerformBasicTest(session);
@@ -41,6 +41,82 @@ namespace Solid.Arduino.Run
                 Console.WriteLine($"以 {connection.BaudRate} 波特率连接到 {connection.PortName} 端口。");
 
             return connection;
+        }
+        private static void StepperTest(IDataConnection connection)
+        {
+            var session = new ArduinoSession(connection, timeOut: 5000);
+
+            //session.ResetBoard();
+            //session.MessageReceived += Session_OnMessageReceived;
+            var firmware = session.GetFirmware();//获取固件信息
+            Console.WriteLine($"固件: {firmware.Name} 版本 {firmware.MajorVersion}.{firmware.MinorVersion}");
+            var protocolVersion = session.GetProtocolVersion();//获取协议信息
+            Console.WriteLine($"Firmata协议版本 {protocolVersion.Major}.{protocolVersion.Minor}");
+            session.ResetBoard();
+
+            ////步进电机
+            session.CreateReceivedStringMonitor().Monitor(f =>
+            {
+
+            });
+            session.CreateStepperMoveCompleteMonitor().Subscribe(new eeee3("步进完成"));
+            session.CreateStepperPositionMonitor().Subscribe(new eeee3("步进汇报"));
+            //session.StepperConfiguration(1, new DeviceConfig
+            //{
+            //    MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
+            //    StepOrPin1Number = 26,
+            //    DirectionOrPin2Number = 28,
+            //    EnablePinNumber = 24,
+            //    InvertEnablePinNumber = true
+            //});
+            //session.StepperConfiguration(0, new DeviceConfig
+            //{
+            //    MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
+            //    StepOrPin1Number = 36,
+            //    DirectionOrPin2Number = 34,
+            //    EnablePinNumber = 30,
+            //    InvertEnablePinNumber = true
+            //});
+            session.SetRAMPSBoard();
+            for (int i = 0; i <= 4; i++)
+            {
+                session.StepperEnable(i, true);
+                session.StepperEnable(i, false);
+                session.StepperSetSpeed(i, 32767);
+                session.StepperSetScceleration(i, 5000);
+            }
+
+
+            while (true)
+            {
+                Console.WriteLine("请输入数字，Q退出");
+                var r = Console.ReadLine();
+                if (r.Equals("Q", StringComparison.OrdinalIgnoreCase))
+                {
+                    for (int i = 0; i <= 4; i++)
+                    {
+                        session.StepperEnable(i, true);
+                    }
+                    return;
+                }
+                if (r.Equals("Z", StringComparison.OrdinalIgnoreCase))
+                {
+                    for (int i = 0; i <= 4; i++)
+                    {
+                        session.StepperZero(i);
+                        session.请求报告步进位置(i);
+                    }
+                }
+                else
+                {
+                    int.TryParse(r, out var n);
+                    for (int i = 0; i <= 4; i++)
+                    {
+                        session.StepperMove(i, n);
+                    }
+
+                }
+            }
         }
 
         private static void PerformBasicTest(ArduinoSession session)

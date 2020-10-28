@@ -46,6 +46,9 @@ namespace Arduino.Firmata.Web
                     {
                         GetStepperStep(f.DeviceNumber).Invoke(f.DeviceNumber);
                     });
+                    session.CreateReceivedStringMonitor().Monitor(f =>
+                    {
+                    });
 
                     session.StepperConfiguration(0, new DeviceConfig
                     {
@@ -125,8 +128,9 @@ namespace Arduino.Firmata.Web
                 f.Clear().SetStep((f1, n1) =>
                 {
                     session.StepperEnable(deviceNumber, true);//停止电机
+                    //var ss1 = session.请求报告步进位置(deviceNumber);
                     session.StepperZero(deviceNumber);//清零
-                    var ss = session.请求报告步进位置(deviceNumber);
+                    //var ss2 = session.请求报告步进位置(deviceNumber);
                 });
             });
         }

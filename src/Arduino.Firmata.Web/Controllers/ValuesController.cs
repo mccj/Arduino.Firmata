@@ -15,7 +15,7 @@ namespace Arduino.Firmata.Web.Controllers
     {
         // GET: api/<ValuesController>
         [HttpGet]
-        public void StepperMove(int deviceNumber = 0, int speed = 10000, int notSpeed = -200)
+        public void StepperMove(int deviceNumber = 0, int speed = 10000, int notSpeed = 1000)
         {
             var session = StepperHandler.GetStepperHandler();
             session.StepperMove(deviceNumber, speed, notSpeed);
