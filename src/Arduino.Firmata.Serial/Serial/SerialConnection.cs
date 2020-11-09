@@ -82,7 +82,7 @@ namespace Arduino.Firmata.Serial
         public int InfiniteTimeout => SerialPort.InfiniteTimeout;
         public event DataReceivedEventHandler DataReceived;
         public string Name => _serial.PortName;
-        public string PortName => _serial.PortName;
+        public string PortName => this.Name;
         public int BaudRate => _serial.BaudRate;
         public bool IsOpen => _serial.IsOpen;
         public string NewLine { get => _serial.NewLine; set => _serial.NewLine = value; }

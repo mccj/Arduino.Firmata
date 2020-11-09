@@ -41,6 +41,7 @@ namespace Arduino.Firmata.Web
                 var firmware = session.GetFirmware();
                 if (firmware.MajorVersion >= 2)
                 {
+                    session.ResetBoard();
                     //步进电机
                     session.CreateStepperMoveCompleteMonitor().Monitor(f =>
                     {

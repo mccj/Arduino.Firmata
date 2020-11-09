@@ -18,27 +18,47 @@ namespace Solid.Arduino.Run
 
 
             var connection = GetConnection();
+            //connection.Open();
+            //connection.Close();
+            //connection.Open();
+            //connection.Close();
             //SimpelTest(connection);
-            StepperTest(connection);
-            //if (connection != null)
-            //    using (var session = new ArduinoSession(connection))
-            //        PerformBasicTest(session);
+            //StepperTest(connection);
+            if (connection != null)
+                using (var session = new ArduinoSession(connection))
+                    PerformBasicTest(session);
 
             Console.WriteLine("Press a key");
             Console.ReadKey(true);
         }
 
+        //private static IDataConnection GetConnection()
+        //{
+        //    Console.WriteLine("正在搜索Arduino连接...");
+        //    //var connection = new SerialConnection("COM4", 57600);
+        //    var connection = new SerialConnection("COM4", 57600);
+
+        //    //EnhancedSerialConnection.Find();
+
+        //    if (connection == null)
+        //        Console.WriteLine("找不到连接。请把您的Arduino板连接到USB端口。");
+        //    else
+        //        Console.WriteLine($"以 {connection.BaudRate} 波特率连接到 {connection.PortName} 端口。");
+
+        //    return connection;
+        //}
         private static IDataConnection GetConnection()
         {
             Console.WriteLine("正在搜索Arduino连接...");
-            var connection = new SerialConnection("COM4", 57600);
+            //var connection = new SerialConnection("COM4", 57600);
+            var connection = new global::Arduino.Firmata.Tcp.TcpConnection("10.11.201.235", 3030);
 
             //EnhancedSerialConnection.Find();
 
             if (connection == null)
                 Console.WriteLine("找不到连接。请把您的Arduino板连接到USB端口。");
             else
-                Console.WriteLine($"以 {connection.BaudRate} 波特率连接到 {connection.PortName} 端口。");
+                Console.WriteLine($"成功连接到 {connection.Name} 端口。");
 
             return connection;
         }
@@ -121,7 +141,8 @@ namespace Solid.Arduino.Run
 
         private static void PerformBasicTest(ArduinoSession session)
         {
-            //session.ResetBoard();
+            session.ResetBoard();
+
             session.MessageReceived += Session_OnMessageReceived;
             session.EvintFirmata().DigitalStateReceived += Session_OnDigitalStateReceived;//接收到数字引脚状态
             session.EvintFirmata().AnalogStateReceived += Session_OnAnalogStateReceived;//接收到数字引脚状态
