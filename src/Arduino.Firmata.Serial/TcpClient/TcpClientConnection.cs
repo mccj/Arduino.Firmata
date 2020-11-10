@@ -8,8 +8,8 @@ namespace Arduino.Firmata.Tcp
     public class TcpClientConnection : IDataConnection
     {
         #region Fields
-        private readonly TcpClient _tcpClient;
         private readonly IPEndPoint _endPoint;
+        private Socket _tcpClient;
         private /*readonly*/ NetworkStream _networkStream;
         private /*readonly*/ System.Threading.Tasks.Task _task;
 
@@ -27,12 +27,7 @@ namespace Arduino.Firmata.Tcp
         /// <param name="port">The port number associated with the address, or 0 to specify any available port. port is in host order.</param>
         public TcpClientConnection(IPEndPoint iPEndPoint)
         {
-            _tcpClient = new TcpClient();
             _endPoint = iPEndPoint;
-
-            _tcpClient.ReceiveTimeout = DefaultTimeoutMs;
-            _tcpClient.SendTimeout = DefaultTimeoutMs;
-
             //_networkStream = _tcpClient.GetStream();
             //_task = System.Threading.Tasks.Task.Run(() =>
             //{
@@ -52,7 +47,7 @@ namespace Arduino.Firmata.Tcp
         public string Name => _endPoint.ToString();
         //public string PortName => this.Name;
         //public int BaudRate => _endPoint.Port;
-        public bool IsOpen => _tcpClient.Connected;
+        public bool IsOpen => _tcpClient?.Connected??false;
         public string NewLine { get; set; } = "\r";
         public int BytesToRead => _networkStream?.DataAvailable == true ? 1 : 0;
         //public bool CanRead => _networkStream.CanRead;
@@ -64,6 +59,12 @@ namespace Arduino.Firmata.Tcp
 
             try
             {
+                _tcpClient = new Socket(SocketType.Stream, ProtocolType.Tcp);
+                _tcpClient.ReceiveTimeout = DefaultTimeoutMs;
+                _tcpClient.SendTimeout = DefaultTimeoutMs;
+
+                //_tcpClient.ReceiveAsync
+
                 _tcpClient.Connect(_endPoint);
 
                 // My observation on the Raspberry Pi was, that the serial port (Arduino connected on /dev/ttyUSB0) already had data
@@ -76,7 +77,7 @@ namespace Arduino.Firmata.Tcp
 
                 _networkStream?.Flush();
 
-                _networkStream = _tcpClient.GetStream();
+                _networkStream = new NetworkStream(_tcpClient);
 
                 _task = System.Threading.Tasks.Task.Run(() =>
                 {
@@ -102,9 +103,9 @@ namespace Arduino.Firmata.Tcp
 
             Thread.Sleep(250);
             _networkStream?.Flush();
-            _networkStream.Close();
-            _networkStream.Dispose();
-            _tcpClient.Close();
+            _networkStream?.Close();
+            _networkStream?.Dispose();
+            _tcpClient?.Close();
 
             //_task?.Dispose();
             _task = null;
@@ -119,9 +120,9 @@ namespace Arduino.Firmata.Tcp
             //DataReceived -= OnSerialPortDataReceived;
             //_tcpClient.ErrorReceived -= OnSerialPortErrorReceived;
 
-            _tcpClient.Dispose();
+            _tcpClient?.Dispose();
 
-            _networkStream.Dispose();
+            _networkStream?.Dispose();
 
             _task?.Dispose();
             _task = null;
@@ -131,7 +132,7 @@ namespace Arduino.Firmata.Tcp
 
         public int ReadByte()
         {
-            if (_tcpClient.Connected)
+            if (_tcpClient?.Connected==true)
                 return _networkStream?.ReadByte() ?? 0;
             else
                 return 0;
@@ -139,7 +140,7 @@ namespace Arduino.Firmata.Tcp
 
         public void Write(string text)
         {
-            if (_tcpClient.Connected)
+            if (_tcpClient?.Connected == true)
             {
                 var bytes = System.Text.Encoding.ASCII.GetBytes(text);
                 _networkStream?.Write(bytes, 0, bytes.Length);
@@ -148,7 +149,7 @@ namespace Arduino.Firmata.Tcp
 
         public void Write(byte[] buffer, int offset, int count)
         {
-            if (_tcpClient.Connected)
+            if (_tcpClient?.Connected == true)
                 _networkStream?.Write(buffer, offset, count);
         }
 
