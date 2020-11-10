@@ -1,5 +1,6 @@
 ﻿using Arduino.Firmata;
 using Arduino.Firmata.Protocol.Firmata;
+using Arduino.Firmata.Protocol.String;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -943,8 +944,7 @@ namespace Solid.Arduino.Test
             session.MessageReceived += (o, e) =>
             {
                 //Assert.AreEqual(MessageType.StringData, e.Value.Type);
-                Assert.IsInstanceOfType(e.Value, typeof(FirmataMessage<PinState>));
-                //Assert.AreEqual("Hello!", ((StringData)e.Value.Value).Text);
+                Assert.AreEqual("Hello!", ((StringData)e.Value.Value).Text);
                 eventHits++;
             };
 

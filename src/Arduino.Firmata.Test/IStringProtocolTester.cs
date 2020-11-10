@@ -184,11 +184,11 @@ namespace Solid.Arduino.Test
 
             var t = Task.Run(() =>
                 {
-                    string data = session.Read(1000);
+                    string data = session.Read(3000);
                 }
             );
 
-            connection.MockReceiveDelayed(new string('*', 1000));
+            connection.MockReceiveDelayed(new string('*', 3000));
 
             await t;
         }

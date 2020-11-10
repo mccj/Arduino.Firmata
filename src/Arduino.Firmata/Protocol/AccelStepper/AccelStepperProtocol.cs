@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace System.Linq
 {
     /// <summary>
-    /// 
+    /// https://github.com/firmata/protocol/blob/master/accelStepperFirmata.md
     /// </summary>
     public static class AccelStepperProtocol
     {

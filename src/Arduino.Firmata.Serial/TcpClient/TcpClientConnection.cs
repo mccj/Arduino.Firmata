@@ -5,7 +5,7 @@ using System.Net;
 
 namespace Arduino.Firmata.Tcp
 {
-    public class TcpConnection : IDataConnection
+    public class TcpClientConnection : IDataConnection
     {
         #region Fields
         private readonly TcpClient _tcpClient;
@@ -19,13 +19,13 @@ namespace Arduino.Firmata.Tcp
         #endregion
 
         #region Constructors
-        public TcpConnection(string ipString, int port) : this(new IPEndPoint(IPAddress.Parse(ipString), port)) { }
+        public TcpClientConnection(string ipString, int port = 3030) : this(new IPEndPoint(IPAddress.Parse(ipString), port)) { }
         /// <summary>
         /// Initializes a new instance of <see cref="MicrosoftSerialConnection"/> class on the given serial port and at the given baud rate.
         /// </summary>
         /// <param name="ipString">A string that contains an IP address in dotted-quad notation for IPv4 and in colon-hexadecimal notation for IPv6.</param>
         /// <param name="port">The port number associated with the address, or 0 to specify any available port. port is in host order.</param>
-        public TcpConnection(IPEndPoint iPEndPoint)
+        public TcpClientConnection(IPEndPoint iPEndPoint)
         {
             _tcpClient = new TcpClient();
             _endPoint = iPEndPoint;

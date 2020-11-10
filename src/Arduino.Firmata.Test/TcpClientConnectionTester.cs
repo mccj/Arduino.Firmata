@@ -1,33 +1,34 @@
 ﻿using Arduino.Firmata.Serial;
+using Arduino.Firmata.Tcp;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Solid.Arduino.Test
 {
     [TestClass]
-    public class SerialConnectionTester
+    public class TcpClientConnectionTester
     {
         [TestMethod]
-        public void SerialConnection_Constructor_WithoutParameters()
+        public void TcpClientConnection_Constructor_WithoutParameters()
         {
-            var connection = new SerialConnection();
+            var connection = new TcpClientConnection("10.11.201.235");
             //Assert.AreEqual(100, connection.ReadTimeout);
             //Assert.AreEqual(100, connection.WriteTimeout);
-            Assert.AreEqual(115200, connection.BaudRate);
+            Assert.AreEqual("10.11.201.235:3030", connection.Name);
         }
 
         [TestMethod]
-        public void SerialConnection_Constructor_WithParameters()
+        public void TcpClientConnection_Constructor_WithParameters()
         {
-            var connection = new SerialConnection("COM1", SerialBaudRate.Bps_115200);
+            var connection = new TcpClientConnection("10.11.201.235", 3030);
             //Assert.AreEqual(100, connection.ReadTimeout);
             //Assert.AreEqual(100, connection.WriteTimeout);
-            Assert.AreEqual(115200, connection.BaudRate);
+            Assert.AreEqual("10.11.201.235:3030", connection.Name);
         }
 
         [TestMethod]
-        public void SerialConnection_OpenAndClose()
+        public void TcpClientConnection_OpenAndClose()
         {
-            var connection = new SerialConnection();
+            var connection = new TcpClientConnection("10.11.201.235");
             connection.Open();
             connection.Close();
             connection.Open();
@@ -35,9 +36,9 @@ namespace Solid.Arduino.Test
         }
 
         [TestMethod]
-        public void SerialConnection_OpenAndDoubleClose()
+        public void TcpClientConnection_OpenAndDoubleClose()
         {
-            var connection = new SerialConnection();
+            var connection = new TcpClientConnection("10.11.201.235");
             connection.Open();
             connection.Close();
             connection.Open();

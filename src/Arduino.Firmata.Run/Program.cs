@@ -17,41 +17,43 @@ namespace Solid.Arduino.Run
             //TimeTest();
 
 
-            var connection = GetConnection();
-            //connection.Open();
-            //connection.Close();
-            //connection.Open();
-            //connection.Close();
-            //SimpelTest(connection);
-            //StepperTest(connection);
+            //var connection = GetSerialConnection();
+            var connection = GetTcpConnection();
             if (connection != null)
-                using (var session = new ArduinoSession(connection))
-                    PerformBasicTest(session);
-
+            {
+                //connection.Open();
+                //connection.Close();
+                //connection.Open();
+                //connection.Close();
+                //SimpelTest(connection);
+                StepperTest(connection, session => { session.SetCNCShieldV3Board(); }, 3);
+                //StepperTest(connection, session => { session.SetRAMPSBoard(); }, 4);
+                //PerformBasicTest(connection);
+            }
             Console.WriteLine("Press a key");
             Console.ReadKey(true);
         }
 
-        //private static IDataConnection GetConnection()
-        //{
-        //    Console.WriteLine("正在搜索Arduino连接...");
-        //    //var connection = new SerialConnection("COM4", 57600);
-        //    var connection = new SerialConnection("COM4", 57600);
-
-        //    //EnhancedSerialConnection.Find();
-
-        //    if (connection == null)
-        //        Console.WriteLine("找不到连接。请把您的Arduino板连接到USB端口。");
-        //    else
-        //        Console.WriteLine($"以 {connection.BaudRate} 波特率连接到 {connection.PortName} 端口。");
-
-        //    return connection;
-        //}
-        private static IDataConnection GetConnection()
+        private static IDataConnection GetSerialConnection()
         {
             Console.WriteLine("正在搜索Arduino连接...");
             //var connection = new SerialConnection("COM4", 57600);
-            var connection = new global::Arduino.Firmata.Tcp.TcpConnection("10.11.201.235", 3030);
+            var connection = new SerialConnection("COM4", 57600);
+
+            //EnhancedSerialConnection.Find();
+
+            if (connection == null)
+                Console.WriteLine("找不到连接。请把您的Arduino板连接到USB端口。");
+            else
+                Console.WriteLine($"以 {connection.BaudRate} 波特率连接到 {connection.PortName} 端口。");
+
+            return connection;
+        }
+        private static IDataConnection GetTcpConnection()
+        {
+            Console.WriteLine("正在搜索Arduino连接...");
+            //var connection = new SerialConnection("COM4", 57600);
+            var connection = new global::Arduino.Firmata.Tcp.TcpClientConnection("10.11.201.82", 3030);
 
             //EnhancedSerialConnection.Find();
 
@@ -62,7 +64,7 @@ namespace Solid.Arduino.Run
 
             return connection;
         }
-        private static void StepperTest(IDataConnection connection)
+        private static void StepperTest(IDataConnection connection, Action<ArduinoSession> action, int stepperCount)
         {
             var session = new ArduinoSession(connection, timeOut: 5000);
 
@@ -81,24 +83,11 @@ namespace Solid.Arduino.Run
             });
             session.CreateStepperMoveCompleteMonitor().Subscribe(new eeee3("步进完成"));
             session.CreateStepperPositionMonitor().Subscribe(new eeee3("步进汇报"));
-            //session.StepperConfiguration(1, new DeviceConfig
-            //{
-            //    MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
-            //    StepOrPin1Number = 26,
-            //    DirectionOrPin2Number = 28,
-            //    EnablePinNumber = 24,
-            //    InvertEnablePinNumber = true
-            //});
-            //session.StepperConfiguration(0, new DeviceConfig
-            //{
-            //    MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
-            //    StepOrPin1Number = 36,
-            //    DirectionOrPin2Number = 34,
-            //    EnablePinNumber = 30,
-            //    InvertEnablePinNumber = true
-            //});
-            session.SetRAMPSBoard();
-            for (int i = 0; i <= 4; i++)
+
+            //session.SetRAMPSBoard();
+            //session.SetCNCShieldV3Board();
+            action(session);
+            for (int i = 0; i <= stepperCount; i++)
             {
                 session.StepperEnable(i, true);
                 session.StepperEnable(i, false);
@@ -134,13 +123,13 @@ namespace Solid.Arduino.Run
                     {
                         session.StepperMove(i, n);
                     }
-
                 }
             }
         }
 
-        private static void PerformBasicTest(ArduinoSession session)
+        private static void PerformBasicTest(IDataConnection connection)
         {
+            var session = new ArduinoSession(connection);
             session.ResetBoard();
 
             session.MessageReceived += Session_OnMessageReceived;
@@ -392,6 +381,10 @@ namespace Solid.Arduino.Run
 
         static void Session_OnMessageReceived(object sender, FirmataMessageEventArgs eventArgs)
         {
+            if (eventArgs.Value.Value is global::Arduino.Firmata.Protocol.String.StringData aaa)
+            {
+
+            }
             //string o;
 
             //switch (eventArgs.Value.Type)
