@@ -47,9 +47,9 @@ namespace Arduino.Firmata.Tcp
         public string Name => _endPoint.ToString();
         //public string PortName => this.Name;
         //public int BaudRate => _endPoint.Port;
-        public bool IsOpen => _tcpClient?.Connected??false;
+        public bool IsOpen => _tcpClient?.Connected ?? false;
         public string NewLine { get; set; } = "\r";
-        public int BytesToRead => _networkStream?.DataAvailable == true ? 1 : 0;
+        public int BytesToRead => _tcpClient.Available;// _networkStream?.DataAvailable == true ? 1 : 0;
         //public bool CanRead => _networkStream.CanRead;
 
         public void Open()
@@ -120,9 +120,8 @@ namespace Arduino.Firmata.Tcp
             //DataReceived -= OnSerialPortDataReceived;
             //_tcpClient.ErrorReceived -= OnSerialPortErrorReceived;
 
-            _tcpClient?.Dispose();
-
             _networkStream?.Dispose();
+            _tcpClient?.Dispose();
 
             _task?.Dispose();
             _task = null;
@@ -132,7 +131,7 @@ namespace Arduino.Firmata.Tcp
 
         public int ReadByte()
         {
-            if (_tcpClient?.Connected==true)
+            if (_tcpClient?.Connected == true)
                 return _networkStream?.ReadByte() ?? 0;
             else
                 return 0;
