@@ -73,8 +73,18 @@ namespace Solid.Arduino.Run
             string ip = "0.0.0.0";
             int port = 30300;
 
-            var tcp = new global::Arduino.Firmata.Tcp.TcpServerConnection();
-            tcp.Start(ip,port);
+            var tcp = new global::Arduino.Firmata.Tcp.TcpServerConnection()
+            {
+                AddArduinoSession = (a, d) =>
+                {
+                    Console.WriteLine("新链接:" + d.Connection);
+                },
+                RemoveArduinoSession = (a, d, s) =>
+                {
+                    Console.WriteLine("断开链接:" + d.Connection + s);
+                }
+            };
+            tcp.Start(ip, port);
             Console.WriteLine("按任意建停止");
             Console.ReadKey();
             tcp.Stop();
