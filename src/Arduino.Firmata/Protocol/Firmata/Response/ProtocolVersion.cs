@@ -14,5 +14,9 @@
         /// Gets or sets the minor version number.
         /// </summary>
         public int Minor { get; set; }
+        public override string ToString()
+        {
+            return $"V{Major}.{Minor}";
+        }
     }
 }

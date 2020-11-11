@@ -24,5 +24,9 @@ namespace Arduino.Firmata.Protocol.Firmata
         /// For analog pins the value is 0 or a positive number. For digital pins a low is represented by 0 and a high is respresented by 1.
         /// </remarks>
         public long Value { get; internal set; }
+        public override string ToString()
+        {
+            return $"Pin {PinNumber}: Mode = {Mode}, Value = {Value}";
+        }
     }
 }

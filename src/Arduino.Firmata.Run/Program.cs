@@ -3,7 +3,10 @@ using Arduino.Firmata.Protocol.AccelStepper;
 using Arduino.Firmata.Protocol.Firmata;
 using Arduino.Firmata.Serial;
 using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading;
 
 namespace Solid.Arduino.Run
@@ -12,24 +15,25 @@ namespace Solid.Arduino.Run
     {
         static void Main(string[] args)
         {
-
+            TcpListener();
+            return;
             //DisplayPortCapabilities();
             //TimeTest();
 
 
-            //var connection = GetSerialConnection();
-            var connection = GetTcpConnection();
-            if (connection != null)
-            {
-                //connection.Open();
-                //connection.Close();
-                //connection.Open();
-                //connection.Close();
-                //SimpelTest(connection);
-                StepperTest(connection, session => { session.SetCNCShieldV3Board(); }, 3);
-                //StepperTest(connection, session => { session.SetRAMPSBoard(); }, 4);
-                //PerformBasicTest(connection);
-            }
+            ////var connection = GetSerialConnection();
+            //var connection = GetTcpConnection();
+            //if (connection != null)
+            //{
+            //    //connection.Open();
+            //    //connection.Close();
+            //    //connection.Open();
+            //    //connection.Close();
+            //    //SimpelTest(connection);
+            //    //StepperTest(connection, session => { session.SetCNCShieldV3Board(); }, 3);
+            //    //StepperTest(connection, session => { session.SetRAMPSBoard(); }, 4);
+            //    PerformBasicTest(connection);
+            //}
             Console.WriteLine("Press a key");
             Console.ReadKey(true);
         }
@@ -38,7 +42,7 @@ namespace Solid.Arduino.Run
         {
             Console.WriteLine("正在搜索Arduino连接...");
             //var connection = new SerialConnection("COM4", 57600);
-            var connection = new SerialConnection("COM4", 57600);
+            var connection = new SerialConnection("COM12", 57600);
 
             //EnhancedSerialConnection.Find();
 
@@ -64,6 +68,18 @@ namespace Solid.Arduino.Run
 
             return connection;
         }
+        private static void TcpListener()
+        {
+            string ip = "0.0.0.0";
+            int port = 30300;
+
+            var tcp = new global::Arduino.Firmata.Tcp.TcpServerConnection();
+            tcp.Start(ip,port);
+            Console.WriteLine("按任意建停止");
+            Console.ReadKey();
+            tcp.Stop();
+        }
+
         private static void StepperTest(IDataConnection connection, Action<ArduinoSession> action, int stepperCount)
         {
             var session = new ArduinoSession(connection, timeOut: 5000);

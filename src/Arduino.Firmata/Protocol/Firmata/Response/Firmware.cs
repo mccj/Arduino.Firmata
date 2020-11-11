@@ -19,5 +19,9 @@
         /// Gets the name of the board's firmware.
         /// </summary>
         public string Name { get; internal set; }
+        public override string ToString()
+        {
+            return $"{Name} V {MajorVersion}.{MinorVersion}";
+        }
     }
 }
