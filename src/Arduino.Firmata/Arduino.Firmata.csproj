@@ -24,6 +24,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Protocol\serial\" />
+	  <Folder Include="Protocol\OneWire\" />
 	</ItemGroup>
 </Project>

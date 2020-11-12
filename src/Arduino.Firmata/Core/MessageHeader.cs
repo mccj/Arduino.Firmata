@@ -75,8 +75,8 @@ namespace Arduino.Firmata
 
         private int _messageTimeout = -1;
         public ProcessMessageHandler _processMessage;
-        public int _messageBufferIndex, _stringBufferIndex;
-        public readonly int[] _messageBuffer = new int[Buffersize];
+        public int MessageBufferIndex, _stringBufferIndex;
+        public readonly int[] MessageBuffer = new int[Buffersize];
         private readonly char[] _stringBuffer = new char[Buffersize];
         #endregion
         #region Constructors
@@ -133,7 +133,7 @@ namespace Arduino.Firmata
                 int serialByte = _connection.ReadByte();
 
 #if DEBUG
-                if (_messageBufferIndex > 0 && _messageBufferIndex % 8 == 0)
+                if (MessageBufferIndex > 0 && MessageBufferIndex % 8 == 0)
                     Debug.WriteLine(string.Empty);
 
                 Debug.Write(string.Format("{0:x2} ", serialByte));
@@ -316,8 +316,8 @@ namespace Arduino.Firmata
 
         private void ProcessCommand(int serialByte)
         {
-            _messageBuffer[0] = serialByte;
-            _messageBufferIndex = 1;
+            MessageBuffer[0] = serialByte;
+            MessageBufferIndex = 1;
             FirmataMessageHeader.Header(serialByte, this);
 
 
@@ -413,11 +413,11 @@ namespace Arduino.Firmata
         }
         public void WriteMessageByte(int dataByte)
         {
-            if (_messageBufferIndex == Buffersize)
+            if (MessageBufferIndex == Buffersize)
                 throw new OverflowException(Messages.OverflowEx_CmdBufferFull);
 
-            _messageBuffer[_messageBufferIndex] = dataByte;
-            _messageBufferIndex++;
+            MessageBuffer[MessageBufferIndex] = dataByte;
+            MessageBufferIndex++;
         }
         internal string GetStringFromQueue(StringRequest request)
         {

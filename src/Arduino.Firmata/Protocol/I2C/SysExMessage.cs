@@ -19,7 +19,7 @@ namespace Arduino.Firmata.Protocol.I2C
 
         public IFirmataMessage Header(MessageHeader messageHeader)
         {
-            var messageByte = (byte)messageHeader._messageBuffer[1];
+            var messageByte = (byte)messageHeader.MessageBuffer[1];
             switch (messageByte)
             {
                 case 0x77:
@@ -35,15 +35,15 @@ namespace Arduino.Firmata.Protocol.I2C
         {
             var reply = new I2CReply
             {
-                Address = messageHeader._messageBuffer[2] | (messageHeader._messageBuffer[3] << 7),
-                Register = messageHeader._messageBuffer[4] | (messageHeader._messageBuffer[5] << 7)
+                Address = messageHeader.MessageBuffer[2] | (messageHeader.MessageBuffer[3] << 7),
+                Register = messageHeader.MessageBuffer[4] | (messageHeader.MessageBuffer[5] << 7)
             };
 
-            var data = new byte[(messageHeader._messageBufferIndex - 5) / 2];
+            var data = new byte[(messageHeader.MessageBufferIndex - 5) / 2];
 
             for (int x = 0; x < data.Length; x++)
             {
-                data[x] = (byte)(messageHeader._messageBuffer[x * 2 + 6] | messageHeader._messageBuffer[x * 2 + 7] << 7);
+                data[x] = (byte)(messageHeader.MessageBuffer[x * 2 + 6] | messageHeader.MessageBuffer[x * 2 + 7] << 7);
             }
 
             reply.Data = data;

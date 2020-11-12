@@ -20,7 +20,7 @@ namespace Arduino.Firmata.Protocol.String
 
         public IFirmataMessage Header(MessageHeader messageHeader)
         {
-            var messageByte = (byte)messageHeader._messageBuffer[1];
+            var messageByte = (byte)messageHeader.MessageBuffer[1];
             switch (messageByte)
             {
                 case 0x71:
@@ -34,11 +34,11 @@ namespace Arduino.Firmata.Protocol.String
 
         private IFirmataMessage CreateStringDataMessage(MessageHeader messageHeader)
         {
-            var builder = new StringBuilder(messageHeader._messageBufferIndex >> 1);
+            var builder = new StringBuilder(messageHeader.MessageBufferIndex >> 1);
 
-            for (int x = 2; x < messageHeader._messageBufferIndex; x += 2)
+            for (int x = 2; x < messageHeader.MessageBufferIndex; x += 2)
             {
-                builder.Append((char)(messageHeader._messageBuffer[x] | (messageHeader._messageBuffer[x + 1] << 7)));
+                builder.Append((char)(messageHeader.MessageBuffer[x] | (messageHeader.MessageBuffer[x + 1] << 7)));
             }
 
             var stringData = new StringData

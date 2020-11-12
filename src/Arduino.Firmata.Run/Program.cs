@@ -1,6 +1,7 @@
 ﻿using Arduino.Firmata;
 using Arduino.Firmata.Protocol.AccelStepper;
 using Arduino.Firmata.Protocol.Firmata;
+using Arduino.Firmata.Protocol.Serial;
 using Arduino.Firmata.Serial;
 using System;
 using System.Collections.Generic;
@@ -15,25 +16,38 @@ namespace Solid.Arduino.Run
     {
         static void Main(string[] args)
         {
-            TcpListener();
-            return;
+            //TcpListener();
+            //return;
             //DisplayPortCapabilities();
             //TimeTest();
 
 
-            ////var connection = GetSerialConnection();
+            //var connection1 = GetTcpConnection();
+            //var connection2 = GetTcpConnection();
+            //var session1 = new ArduinoSession(connection1);
+            //var session2 = new ArduinoSession(connection2);
+            //var f1 = session1.GetFirmware();
+            //var f2 = session2.GetFirmware();
+
+
+
+
+
+            var connection = GetSerialConnection();
             //var connection = GetTcpConnection();
-            //if (connection != null)
-            //{
-            //    //connection.Open();
-            //    //connection.Close();
-            //    //connection.Open();
-            //    //connection.Close();
-            //    //SimpelTest(connection);
-            //    //StepperTest(connection, session => { session.SetCNCShieldV3Board(); }, 3);
-            //    //StepperTest(connection, session => { session.SetRAMPSBoard(); }, 4);
-            //    PerformBasicTest(connection);
-            //}
+            if (connection != null)
+            {
+                //connection.Open();
+                //connection.Close();
+                //connection.Open();
+                //connection.Close();
+                //SimpelTest(connection);
+                //StepperTest(connection, session => { session.SetCNCShieldV3Board(); }, 3);
+                //StepperTest(connection, session => { session.SetRAMPSBoard(); }, 4);
+                //PerformBasicTest(connection);
+                //test1(connection);
+                SerialTest(connection);
+            }
             Console.WriteLine("Press a key");
             Console.ReadKey(true);
         }
@@ -42,7 +56,7 @@ namespace Solid.Arduino.Run
         {
             Console.WriteLine("正在搜索Arduino连接...");
             //var connection = new SerialConnection("COM4", 57600);
-            var connection = new SerialConnection("COM12", 57600);
+            var connection = new SerialConnection("COM9", 57600);
 
             //EnhancedSerialConnection.Find();
 
@@ -89,7 +103,58 @@ namespace Solid.Arduino.Run
             Console.ReadKey();
             tcp.Stop();
         }
+        private static void test1(IDataConnection connection)
+        {
+            var session = new ArduinoSession(connection, timeOut: 5000);
+            session.ResetBoard();
+            var firmware = session.GetFirmware();//获取固件信息
+            var protocolVersion = session.GetProtocolVersion();//获取协议信息
+            var ys = new[] { 27, 28, 4, 5, 8, 9, 10, 11, 12, 47, 48, 49, 24, 23, 38, 14, 15, 16, 17 };
+            foreach (var item in ys)
+            {
+                session.SetDigitalPinMode(item, PinMode.DigitalOutput);//设置引脚模式
+                //session.SetDigitalPin(item, true);//设置输出
+                session.SetDigitalPin(item, false);//设置输出
+            }
+            var xs = new[] { 2, 3, 18, 19, 29, 39, 30, 31, 32, 33, 34, 35, 36, 37, 40, 41 };
+            foreach (var item in xs)
+            {
+                session.SetDigitalPinMode(item, PinMode.DigitalInput);//设置引脚模式
+                //session.SetDigitalPin(item, true);//设置输出
+                //session.SetDigitalPin(item, false);//设置输出
+            }
+        }
+        private static void SerialTest(IDataConnection connection)
+        {
+            var session = new ArduinoSession(connection, timeOut: 5000);
+            session.ResetBoard();
+            session.MessageReceived += Session_OnMessageReceived;
+            var firmware = session.GetFirmware();//获取固件信息
+            var protocolVersion = session.GetProtocolVersion();//获取协议信息
 
+            session.CreateSerialReplyMonitor().Monitor((a) =>
+            {
+                Console.WriteLine(a.Serial + " " + System.Text.Encoding.UTF8.GetString(a.Data));
+            });
+            //session.SerialConfig(HW_SERIAL.HW_SERIAL0, 9600);
+            //session.SerialWrite(HW_SERIAL.HW_SERIAL0, "123456789123456789");
+            //session.SerialRead(HW_SERIAL.HW_SERIAL0);
+            //session.SerialListen(SW_SERIAL.SW_SERIAL0);
+            //session.SerialConfig(HW_SERIAL.HW_SERIAL1, 9600/*, 16, 17*/);
+            //session.SerialWrite(HW_SERIAL.HW_SERIAL1, "123456789123456789");
+            //session.SerialRead(HW_SERIAL.HW_SERIAL1);
+            //session.SerialListen(SW_SERIAL.SW_SERIAL1);
+            //session.SerialConfig(HW_SERIAL.HW_SERIAL2, 9600/*, 0, 1*/);
+            //session.SerialWrite(HW_SERIAL.HW_SERIAL2, "123456789123456789");
+            //session.SerialRead(HW_SERIAL.HW_SERIAL2);
+            //session.SerialListen(SW_SERIAL.SW_SERIAL2);
+            session.SerialConfig(HW_SERIAL.HW_SERIAL3, 9600);
+            //session.SerialWrite(HW_SERIAL.HW_SERIAL3, "1");
+            session.SerialRead(HW_SERIAL.HW_SERIAL3, true, 3);
+            session.SerialListen(SW_SERIAL.SW_SERIAL3);
+
+
+        }
         private static void StepperTest(IDataConnection connection, Action<ArduinoSession> action, int stepperCount)
         {
             var session = new ArduinoSession(connection, timeOut: 5000);

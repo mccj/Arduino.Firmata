@@ -20,8 +20,8 @@ namespace Arduino.Firmata.Protocol.AccelStepper
 
         public IFirmataMessage Header(MessageHeader messageHeader)
         {
-            var messageByte = (byte)messageHeader._messageBuffer[1];
-            var messageByte2 = (byte)messageHeader._messageBuffer[2];
+            var messageByte = (byte)messageHeader.MessageBuffer[1];
+            var messageByte2 = (byte)messageHeader.MessageBuffer[2];
             if (messageByte == AccelStepperProtocol.ACCELSTEPPER_DATA && messageByte2 == 0x06)
                 return CreateStepperPositionResponse(messageHeader);//步进报告位置
             else if (messageByte == AccelStepperProtocol.ACCELSTEPPER_DATA && messageByte2 == 0x0a)
@@ -33,8 +33,8 @@ namespace Arduino.Firmata.Protocol.AccelStepper
         }
         private StepperPosition GetStepperPosition(MessageHeader messageHeader)
         {
-            var deviceNumber = messageHeader._messageBuffer[3];
-            var stepsNum = AccelStepperProtocol.decode32BitSignedInteger((byte)messageHeader._messageBuffer[4], (byte)messageHeader._messageBuffer[5], (byte)messageHeader._messageBuffer[6], (byte)messageHeader._messageBuffer[7], (byte)messageHeader._messageBuffer[8]);
+            var deviceNumber = messageHeader.MessageBuffer[3];
+            var stepsNum = NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7], (byte)messageHeader.MessageBuffer[8]);
 
             var currentState = new StepperPosition
             {
@@ -62,7 +62,7 @@ namespace Arduino.Firmata.Protocol.AccelStepper
         }
         private IFirmataMessage CreateMultiStepperMoveCompelteResponse(MessageHeader messageHeader)
         {
-            var groupNumber = messageHeader._messageBuffer[3];
+            var groupNumber = messageHeader.MessageBuffer[3];
 
             var currentState = groupNumber;
             messageHeader._arduinoSession.EvintAccelStepper().OnMultiStepperMoveCompelteReceived(new FirmataEventArgs<int>(currentState));

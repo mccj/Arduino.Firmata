@@ -24,7 +24,7 @@ namespace Arduino.Firmata.Protocol.Firmata
 
         public IFirmataMessage Header(MessageHeader messageHeader)
         {
-            var messageByte = (byte)messageHeader._messageBuffer[1];
+            var messageByte = (byte)messageHeader.MessageBuffer[1];
             switch (messageByte)
             {
                 case FirmataProtocol.REPORT_FIRMWARE:
@@ -43,15 +43,15 @@ namespace Arduino.Firmata.Protocol.Firmata
         {
             var firmware = new Firmware
             {
-                MajorVersion = messageHeader._messageBuffer[2],
-                MinorVersion = messageHeader._messageBuffer[3]
+                MajorVersion = messageHeader.MessageBuffer[2],
+                MinorVersion = messageHeader.MessageBuffer[3]
             };
 
-            var builder = new StringBuilder(messageHeader._messageBufferIndex);
+            var builder = new StringBuilder(messageHeader.MessageBufferIndex);
 
-            for (int x = 4; x < messageHeader._messageBufferIndex; x += 2)
+            for (int x = 4; x < messageHeader.MessageBufferIndex; x += 2)
             {
-                builder.Append((char)(messageHeader._messageBuffer[x] | (messageHeader._messageBuffer[x + 1] << 7)));
+                builder.Append((char)(messageHeader.MessageBuffer[x] | (messageHeader.MessageBuffer[x + 1] << 7)));
             }
 
             firmware.Name = builder.ToString();
@@ -59,20 +59,20 @@ namespace Arduino.Firmata.Protocol.Firmata
         }
         private IFirmataMessage CreatePinStateResponse(MessageHeader messageHeader)
         {
-            if (messageHeader._messageBufferIndex < 5)
+            if (messageHeader.MessageBufferIndex < 5)
                 throw new InvalidOperationException(Messages.InvalidOpEx_PinNotSupported);
 
             int value = 0;
 
-            for (int x = messageHeader._messageBufferIndex - 1; x > 3; x--)
+            for (int x = messageHeader.MessageBufferIndex - 1; x > 3; x--)
             {
-                value = (value << 7) | messageHeader._messageBuffer[x];
+                value = (value << 7) | messageHeader.MessageBuffer[x];
             }
 
             var pinState = new PinState
             {
-                PinNumber = messageHeader._messageBuffer[2],
-                Mode = (PinMode)messageHeader._messageBuffer[3],
+                PinNumber = messageHeader.MessageBuffer[2],
+                Mode = (PinMode)messageHeader.MessageBuffer[3],
                 Value = value
             };
             return new FirmataMessage<PinState>(pinState);
@@ -81,16 +81,16 @@ namespace Arduino.Firmata.Protocol.Firmata
         {
             var pins = new List<AnalogPinMapping>(8);
 
-            for (int x = 2; x < messageHeader._messageBufferIndex; x++)
+            for (int x = 2; x < messageHeader.MessageBufferIndex; x++)
             {
-                if (messageHeader._messageBuffer[x] != 0x7F)
+                if (messageHeader.MessageBuffer[x] != 0x7F)
                 {
                     pins.Add
                     (
                         new AnalogPinMapping
                         {
                             PinNumber = x - 2,
-                            Channel = messageHeader._messageBuffer[x]
+                            Channel = messageHeader.MessageBuffer[x]
                         }
                     );
                 }
@@ -105,22 +105,22 @@ namespace Arduino.Firmata.Protocol.Firmata
             int pinIndex = 0;
             int x = 2;
 
-            while (x < messageHeader._messageBufferIndex)
+            while (x < messageHeader.MessageBufferIndex)
             {
-                if (messageHeader._messageBuffer[x] != 127)
+                if (messageHeader.MessageBuffer[x] != 127)
                 {
                     var capability = new PinCapability { PinNumber = pinIndex };
 
-                    while (x < messageHeader._messageBufferIndex && messageHeader._messageBuffer[x] != 127)
+                    while (x < messageHeader.MessageBufferIndex && messageHeader.MessageBuffer[x] != 127)
                     {
-                        PinMode pinMode = (PinMode)messageHeader._messageBuffer[x];
-                        bool isCapable = (messageHeader._messageBuffer[x + 1] != 0);
+                        PinMode pinMode = (PinMode)messageHeader.MessageBuffer[x];
+                        bool isCapable = (messageHeader.MessageBuffer[x + 1] != 0);
 
                         switch (pinMode)
                         {
                             case PinMode.AnalogInput:
                                 capability.Analog = true;
-                                capability.AnalogResolution = messageHeader._messageBuffer[x + 1];
+                                capability.AnalogResolution = messageHeader.MessageBuffer[x + 1];
                                 break;
 
                             case PinMode.DigitalInput:
@@ -133,12 +133,12 @@ namespace Arduino.Firmata.Protocol.Firmata
 
                             case PinMode.PwmOutput:
                                 capability.Pwm = true;
-                                capability.PwmResolution = messageHeader._messageBuffer[x + 1];
+                                capability.PwmResolution = messageHeader.MessageBuffer[x + 1];
                                 break;
 
                             case PinMode.ServoControl:
                                 capability.Servo = true;
-                                capability.ServoResolution = messageHeader._messageBuffer[x + 1];
+                                capability.ServoResolution = messageHeader.MessageBuffer[x + 1];
                                 break;
 
                             case PinMode.I2C:
@@ -151,7 +151,7 @@ namespace Arduino.Firmata.Protocol.Firmata
 
                             case PinMode.StepperControl:
                                 capability.StepperControl = true;
-                                capability.MaxStepNumber = messageHeader._messageBuffer[x + 1];
+                                capability.MaxStepNumber = messageHeader.MessageBuffer[x + 1];
                                 break;
 
                             case PinMode.Encoder:

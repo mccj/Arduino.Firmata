@@ -1,6 +1,7 @@
 ﻿using Arduino.Firmata.Extend;
 using Arduino.Firmata.Protocol.AccelStepper;
 using Arduino.Firmata.Protocol.I2C;
+using Arduino.Firmata.Protocol.Serial;
 using Arduino.Firmata.Protocol.String;
 using System;
 using System.Linq;
@@ -14,6 +15,14 @@ namespace Arduino.Firmata.Protocol.Firmata
     /// <seealso href="http://arduino.cc/en/Reference/Serial">Serial reference for Arduino</seealso>
     public class FirmataMessageHeader //: IDisposable
     {
+        public static ISysExMessage[] sysExMessage = new ISysExMessage[] {
+                new SysExMessage(),
+                new I2CSysExMessage(),
+                new StringSysExMessage(),
+                new AccelStepperSysExMessage(),
+                new SerialSysExMessage()
+                };
+
         private enum MessageHeader1
         {
             AnalogState = 0xE0, // 224
@@ -89,7 +98,7 @@ namespace Arduino.Firmata.Protocol.Firmata
         }
         private static void ProcessAnalogStateMessage(int messageByte)
         {
-            if (_messageHeader._messageBufferIndex < 2)
+            if (_messageHeader.MessageBufferIndex < 2)
             {
                 _messageHeader.WriteMessageByte(messageByte);
             }
@@ -97,8 +106,8 @@ namespace Arduino.Firmata.Protocol.Firmata
             {
                 var currentState = new AnalogState
                 {
-                    Channel = _messageHeader._messageBuffer[0] & 0x0F,
-                    Level = (_messageHeader._messageBuffer[1] | (messageByte << 7))
+                    Channel = _messageHeader.MessageBuffer[0] & 0x0F,
+                    Level = (_messageHeader.MessageBuffer[1] | (messageByte << 7))
                 };
                 _messageHeader._processMessage = null;
 
@@ -115,7 +124,7 @@ namespace Arduino.Firmata.Protocol.Firmata
 
         private static void ProcessDigitalStateMessage(int messageByte)
         {
-            if (_messageHeader._messageBufferIndex < 2)
+            if (_messageHeader.MessageBufferIndex < 2)
             {
                 _messageHeader.WriteMessageByte(messageByte);
             }
@@ -123,8 +132,8 @@ namespace Arduino.Firmata.Protocol.Firmata
             {
                 var currentState = new DigitalPortState
                 {
-                    Port = _messageHeader._messageBuffer[0] & 0x0F,
-                    Pins = _messageHeader._messageBuffer[1] | (messageByte << 7)
+                    Port = _messageHeader.MessageBuffer[0] & 0x0F,
+                    Pins = _messageHeader.MessageBuffer[1] | (messageByte << 7)
                 };
                 _messageHeader._processMessage = null;
 
@@ -141,7 +150,7 @@ namespace Arduino.Firmata.Protocol.Firmata
 
         private static void ProcessProtocolVersionMessage(int messageByte)
         {
-            if (_messageHeader._messageBufferIndex < 2)
+            if (_messageHeader.MessageBufferIndex < 2)
             {
                 _messageHeader.WriteMessageByte(messageByte);
             }
@@ -149,7 +158,7 @@ namespace Arduino.Firmata.Protocol.Firmata
             {
                 var version = new ProtocolVersion
                 {
-                    Major = _messageHeader._messageBuffer[1],
+                    Major = _messageHeader.MessageBuffer[1],
                     Minor = messageByte
                 };
                 DeliverMessage(new FirmataMessage<ProtocolVersion>(version));
@@ -164,16 +173,9 @@ namespace Arduino.Firmata.Protocol.Firmata
                 return;
             }
 
-
-            var sysExMessage = new ISysExMessage[] {
-                new SysExMessage(),
-                new I2CSysExMessage(),
-                new StringSysExMessage(),
-                new AccelStepperSysExMessage()
-                };
             foreach (var item in sysExMessage)
             {
-                if (item.CanHeader((byte)_messageHeader._messageBuffer[1]))
+                if (item.CanHeader((byte)_messageHeader.MessageBuffer[1]))
                 {
                     DeliverMessage(item.Header(_messageHeader));
                     return;
