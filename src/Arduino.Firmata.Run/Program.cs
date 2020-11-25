@@ -42,11 +42,22 @@ namespace Solid.Arduino.Run
                 //connection.Open();
                 //connection.Close();
                 //SimpelTest(connection);
-                //StepperTest(connection, session => { session.SetCNCShieldV3Board(); }, 3);
-                //StepperTest(connection, session => { session.SetRAMPSBoard(); }, 4);
+                //StepperTest(connection, session => { session.SetCNCShieldV3Board(); }, 4);
+                //StepperTest(connection, session => { session.SetRAMPSBoard(); }, 5);
+                StepperTest(connection, session =>
+                {
+                    session.StepperConfiguration(0, new DeviceConfig
+                    {
+                        MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
+                        StepOrPin1Number = 27,
+                        DirectionOrPin2Number = 28,
+                        EnablePinNumber = 4,
+                        InvertEnablePinNumber = true
+                    });
+                }, 1);
                 //PerformBasicTest(connection);
                 //test1(connection);
-                SerialTest(connection);
+                //SerialTest(connection);
             }
             Console.WriteLine("Press a key");
             Console.ReadKey(true);
@@ -178,11 +189,12 @@ namespace Solid.Arduino.Run
             //session.SetRAMPSBoard();
             //session.SetCNCShieldV3Board();
             action(session);
-            for (int i = 0; i <= stepperCount; i++)
+            for (int i = 0; i < stepperCount; i++)
             {
                 session.StepperEnable(i, true);
                 session.StepperEnable(i, false);
-                session.StepperSetSpeed(i, 32767);
+                //session.StepperSetSpeed(i, 32767);
+                session.StepperSetSpeed(i, 32767*10);
                 session.StepperSetScceleration(i, 5000);
             }
 
