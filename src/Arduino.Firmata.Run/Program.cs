@@ -44,6 +44,7 @@ namespace Solid.Arduino.Run
                 //SimpelTest(connection);
                 //StepperTest(connection, session => { session.SetCNCShieldV3Board(); }, 4);
                 //StepperTest(connection, session => { session.SetRAMPSBoard(); }, 5);
+
                 StepperTest(connection, session =>
                 {
                     session.StepperConfiguration(0, new DeviceConfig
@@ -51,10 +52,64 @@ namespace Solid.Arduino.Run
                         MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
                         StepOrPin1Number = 27,
                         DirectionOrPin2Number = 28,
-                        EnablePinNumber = 4,
-                        InvertEnablePinNumber = true
+                        //EnablePinNumber = 4,
+                        //InvertEnablePinNumber = false
                     });
-                }, 1);
+                    session.StepperConfiguration(1, new DeviceConfig
+                    {
+                        MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
+
+                        StepOrPin1Number = 4,
+                        DirectionOrPin2Number = 5,
+                        //EnablePinNumber = 8,
+                        //InvertEnablePinNumber = false
+                    });
+                    session.StepperConfiguration(2, new DeviceConfig
+                    {
+                        MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
+
+                        StepOrPin1Number = 8,
+                        DirectionOrPin2Number = 9,
+                        //EnablePinNumber = 10,
+                        //InvertEnablePinNumber = false
+                    });
+                    session.StepperConfiguration(3, new DeviceConfig
+                    {
+                        MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
+
+                        StepOrPin1Number = 10,
+                        DirectionOrPin2Number = 11,
+                        //EnablePinNumber = 12,
+                        InvertStepOrPin1Number = true,
+                        //InvertEnablePinNumber = false
+                    });
+                    session.StepperConfiguration(4, new DeviceConfig
+                    {
+                        MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
+
+                        StepOrPin1Number = 12,
+                        DirectionOrPin2Number = 47,
+                        //EnablePinNumber = 12,
+                        //InvertEnablePinNumber = false
+                    });
+                }, 4);
+
+                //来回移动(connection, session =>
+                //{
+                //    session.StepperConfiguration(0, new DeviceConfig
+                //    {
+                //        MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
+                //        //StepOrPin1Number = 27,
+                //        //DirectionOrPin2Number = 28,
+                //        ////EnablePinNumber = 4,
+
+                //        StepOrPin1Number = 4,
+                //        DirectionOrPin2Number = 5,
+                //        //EnablePinNumber = 8,
+                //        InvertEnablePinNumber = true
+                //    });
+                //}, 0, 1000);
+
                 //PerformBasicTest(connection);
                 //test1(connection);
                 //SerialTest(connection);
@@ -67,7 +122,7 @@ namespace Solid.Arduino.Run
         {
             Console.WriteLine("正在搜索Arduino连接...");
             //var connection = new SerialConnection("COM4", 57600);
-            var connection = new SerialConnection("COM9", 57600);
+            var connection = new SerialConnection("COM12", 115200);
 
             //EnhancedSerialConnection.Find();
 
@@ -76,6 +131,8 @@ namespace Solid.Arduino.Run
             else
                 Console.WriteLine($"以 {connection.BaudRate} 波特率连接到 {connection.PortName} 端口。");
 
+            connection.Open();
+            System.Threading.Thread.Sleep(1000 * 4);
             return connection;
         }
         private static IDataConnection GetTcpConnection()
@@ -166,6 +223,62 @@ namespace Solid.Arduino.Run
 
 
         }
+
+        private static void 来回移动(IDataConnection connection, Action<ArduinoSession> action, int stepperNo, int iii)
+        {
+            var session = new ArduinoSession(connection, timeOut: 5000);
+
+            //session.ResetBoard();
+            //session.MessageReceived += Session_OnMessageReceived;
+            var firmware = session.GetFirmware();//获取固件信息
+            Console.WriteLine($"固件: {firmware.Name} 版本 {firmware.MajorVersion}.{firmware.MinorVersion}");
+            var protocolVersion = session.GetProtocolVersion();//获取协议信息
+            Console.WriteLine($"Firmata协议版本 {protocolVersion.Major}.{protocolVersion.Minor}");
+            session.ResetBoard();
+
+            var bb1 = true;
+            var bb2 = true;
+            ////步进电机
+            session.CreateReceivedStringMonitor().Monitor(f =>
+            {
+            });
+            session.CreateStepperMoveCompleteMonitor().Monitor(f =>
+            {
+                System.Threading.Thread.Sleep(1000);
+                bb2 = !bb2;
+                session.StepperMove(stepperNo, bb2 ? -iii : iii);
+                Console.WriteLine("步进电机: {0}, 驱动器编号: {1},驱动器: {2}", f, f.DeviceNumber, f.StepsNum);
+            });
+            //session.CreateStepperMoveCompleteMonitor().Subscribe(new eeee3("步进完成"));
+            session.CreateStepperPositionMonitor().Subscribe(new eeee3("步进汇报"));
+
+            //session.SetRAMPSBoard();
+            //session.SetCNCShieldV3Board();
+            action(session);
+
+            session.StepperEnable(stepperNo, true);
+            session.StepperEnable(stepperNo, false);
+            //session.StepperSetSpeed(i, 32767);
+            //session.StepperSetSpeed(i, 32767/12);
+            session.StepperSetSpeed(stepperNo, 32767 / 10);
+            session.StepperSetScceleration(stepperNo, 5000 * 3);
+
+
+            Console.WriteLine("按任意键开始");
+            Console.ReadKey();
+
+
+            session.StepperMove(stepperNo, bb2 ? -iii : iii);
+
+            Console.WriteLine("按q键退出");
+
+            while (true)
+            {
+                var key = Console.ReadKey().KeyChar.ToString();
+                if (key.Equals("Q", StringComparison.OrdinalIgnoreCase)) return;
+            }
+        }
+
         private static void StepperTest(IDataConnection connection, Action<ArduinoSession> action, int stepperCount)
         {
             var session = new ArduinoSession(connection, timeOut: 5000);
@@ -177,6 +290,20 @@ namespace Solid.Arduino.Run
             var protocolVersion = session.GetProtocolVersion();//获取协议信息
             Console.WriteLine($"Firmata协议版本 {protocolVersion.Major}.{protocolVersion.Minor}");
             session.ResetBoard();
+
+            session.SetDigitalPinMode(2, PinMode.DigitalInput);//设置引脚模式
+            session.SetDigitalPinMode(3, PinMode.DigitalInput);//设置引脚模式
+            session.SetDigitalPinMode(18, PinMode.DigitalInput);//设置引脚模式
+            session.SetDigitalPinMode(19, PinMode.DigitalInput);//设置引脚模式
+            session.SetDigitalPinMode(29, PinMode.DigitalInput);//设置引脚模式
+            session.SetDigitalPinMode(39, PinMode.DigitalInput);//设置引脚模式
+            session.SetDigitalPinMode(30, PinMode.DigitalInput);//设置引脚模式
+            session.SetDigitalPinMode(31, PinMode.DigitalInput);//设置引脚模式
+
+            session.CreateDigitalStateMonitor().Subscribe(new eeee1("无"));//设置数字信号输入监控调用
+            session.SetDigitalReportMode(0, true);//设置监控报告
+            //session.SetDigitalReportMode(1, true);
+
 
             ////步进电机
             session.CreateReceivedStringMonitor().Monitor(f =>
@@ -194,8 +321,9 @@ namespace Solid.Arduino.Run
                 session.StepperEnable(i, true);
                 session.StepperEnable(i, false);
                 //session.StepperSetSpeed(i, 32767);
-                session.StepperSetSpeed(i, 32767*10);
-                session.StepperSetScceleration(i, 5000);
+                //session.StepperSetSpeed(i, 32767/12);
+                session.StepperSetSpeed(i, 32767 / 10);
+                session.StepperSetScceleration(i, 5000 / 5);
             }
 
 
@@ -205,7 +333,7 @@ namespace Solid.Arduino.Run
                 var r = Console.ReadLine();
                 if (r.Equals("Q", StringComparison.OrdinalIgnoreCase))
                 {
-                    for (int i = 0; i <= 4; i++)
+                    for (int i = 0; i <= stepperCount; i++)
                     {
                         session.StepperEnable(i, true);
                     }
@@ -213,7 +341,7 @@ namespace Solid.Arduino.Run
                 }
                 if (r.Equals("Z", StringComparison.OrdinalIgnoreCase))
                 {
-                    for (int i = 0; i <= 4; i++)
+                    for (int i = 0; i <= stepperCount; i++)
                     {
                         session.StepperZero(i);
                         session.请求报告步进位置(i);
@@ -222,7 +350,7 @@ namespace Solid.Arduino.Run
                 else
                 {
                     int.TryParse(r, out var n);
-                    for (int i = 0; i <= 4; i++)
+                    for (int i = 0; i <= stepperCount; i++)
                     {
                         session.StepperMove(i, n);
                     }
@@ -380,7 +508,6 @@ namespace Solid.Arduino.Run
             public void OnNext(DigitalPortState value)
             {
                 Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(0) ? 'X' : 'O', 0, value.Pins);
-                Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(1) ? 'X' : 'O', 1, value.Pins);
                 Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(1) ? 'X' : 'O', 1, value.Pins);
                 Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(2) ? 'X' : 'O', 2, value.Pins);
                 Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(3) ? 'X' : 'O', 3, value.Pins);
