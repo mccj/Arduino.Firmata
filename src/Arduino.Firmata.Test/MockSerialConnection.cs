@@ -196,7 +196,16 @@ namespace Solid.Arduino.Test
             while (_responseQueue.Count > 0)
                 ReceiveData(_responseQueue.Peek());
         }
+        public void MockReceiveDelayed(byte[] data)
+        {
+            System.Threading.Thread.Sleep(20);
 
+            _responseQueue.Enqueue(data);
+            BytesToRead += data.Length;
+
+            while (_responseQueue.Count > 0)
+                ReceiveData(_responseQueue.Peek());
+        }
         #endregion
 
         #region Private Methods

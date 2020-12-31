@@ -988,6 +988,24 @@ namespace Solid.Arduino.Test
             Assert.AreEqual("test", f.Name);
         }
 
+        [TestMethod]
+        public void test()
+        {
+            var connection = new MockSerialConnection();
+
+            var session = CreateFirmataSession(connection, 3);
+            //发送获取固件信息  Arduino-Firmata-Serial.ino V 2.10
+            //F0 79 F7
+            connection.MockReceiveDelayed(new byte[] { 0xF0, 0x79, 0x02, 0x0a,
+                0x41, 0x00, 0x72, 0x00, 0x64, 0x00, 0x75, 0x00, 0x69, 0x00, 0x6e, 0x00, 0x6f, 0x00, 0x2d, 0x00,
+                0x46, 0x00, 0x69, 0x00, 0x72, 0x00, 0x6d, 0x00, 0x61, 0x00, 0x74, 0x00, 0x61, 0x00, 0x2d, 0x00,
+                0x53 , 0x00, 0x65, 0x00, 0x72, 0x00, 0x69, 0x00, 0x61, 0x00, 0x6c, 0x00, 0x2e, 0x00,
+                0x69, 0x00, 0x6e, 0x00, 0x6f, 0x00,
+                0xF7 });
+            //connection.EnqueueResponse(Name.To14BitIso());
+            //connection.EnqueueResponse(0xF7);
+            var f= session.GetMessageFromQueue<Firmware>().Value;
+        }
 
         private ArduinoSession CreateFirmataSession(IDataConnection connection, int timeout = -1)
         {
