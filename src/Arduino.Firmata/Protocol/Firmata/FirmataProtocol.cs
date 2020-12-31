@@ -101,6 +101,17 @@ namespace System.Linq
 
             return new AnalogStateTracker(session.EvintFirmata(), channel);
         }
+        public static IObservable<AnalogState> CreateAnalogStateChangeMonitor(this ArduinoSession session)
+        {
+            return new AnalogStateChangeTracker(session.EvintFirmata());
+        }
+        public static IObservable<AnalogState> CreateAnalogStateChangeMonitor(this ArduinoSession session, int channel)
+        {
+            if (channel < 0 || channel > 15)
+                throw new ArgumentOutOfRangeException(nameof(channel), Messages.ArgumentEx_ChannelRange0_15);
+
+            return new AnalogStateChangeTracker(session.EvintFirmata(), channel);
+        }
         /// <summary>
         /// Creates an observable object tracking <see cref="DigitalPortState"/> messages.
         /// </summary>
@@ -123,7 +134,18 @@ namespace System.Linq
 
             return new DigitalStateTracker(session.EvintFirmata(), port);
         }
+        public static IObservable<DigitalPinState> CreateDigitalStateChangeMonitor(this ArduinoSession session)
+        {
+            return new DigitalStateChangeTracker(session.EvintFirmata());
+        }
 
+        public static IObservable<DigitalPinState> CreateDigitalStateChangeMonitor(this ArduinoSession session, int port)
+        {
+            if (port < 0 || port > 15)
+                throw new ArgumentOutOfRangeException(nameof(port), Messages.ArgumentEx_PortRange0_15);
+
+            return new DigitalStateChangeTracker(session.EvintFirmata(), port);
+        }
         /// <summary>
         /// Sends a message string.
         /// </summary>

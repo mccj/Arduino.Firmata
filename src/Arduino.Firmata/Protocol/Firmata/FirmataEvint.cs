@@ -15,10 +15,12 @@ namespace Arduino.Firmata.Protocol.Firmata
     /// <param name="sender">The object raising the event</param>
     /// <param name="eventArgs">Event arguments holding a <see cref="DigitalPortState"/></param>
     public delegate void DigitalStateReceivedHandler(object sender, FirmataEventArgs<DigitalPortState> eventArgs);
+    public delegate void DigitalStateReceivedChangeHandler(object sender, DigitalPinState eventArgs);
 
     public class FirmataEvint
     {
         private ArduinoSession session;
+        private bool?[] portState = new bool?[256];
 
         public FirmataEvint(ArduinoSession session)
         {
@@ -27,15 +29,51 @@ namespace Arduino.Firmata.Protocol.Firmata
 
         /// <inheritdoc cref="IFirmataProtocol.AnalogStateReceived"/>
         public event AnalogStateReceivedHandler AnalogStateReceived;
+        public event AnalogStateReceivedHandler AnalogStateChangeReceived;
         /// <inheritdoc cref="IFirmataProtocol.DigitalStateReceived"/>
         public event DigitalStateReceivedHandler DigitalStateReceived;
+        public event DigitalStateReceivedChangeHandler DigitalStateChangeReceived;
         internal void OnAnalogStateReceived(FirmataEventArgs<AnalogState> eventArgs)
         {
             AnalogStateReceived?.Invoke(session, eventArgs);
+
+            //var value = eventArgs.Value;
+            //for (int i = 0; i < 8; i++)
+            //{
+            //    var portPinNumber = value.Port * 8 + i;
+            //    var currentState = value.IsSet(i);
+            //    var initChange = !portState[portPinNumber].HasValue;
+
+            //    if (portState[portPinNumber] != currentState)
+            //    {
+            //        portState[portPinNumber] = currentState;
+
+            //        var pinState = new DigitalPinState(value.Port, portPinNumber, currentState, initChange);
+            //        AnalogStateChangeReceived?.Invoke(session, pinState);
+            //        //Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(i) ? 'X' : 'O', i, value.Pins);
+            //    }
+            //}
         }
         internal void OnDigitalStateReceived(FirmataEventArgs<DigitalPortState> eventArgs)
         {
             DigitalStateReceived?.Invoke(session, eventArgs);
+
+            var value = eventArgs.Value;
+            for (int i = 0; i < 8; i++)
+            {
+                var portPinNumber = value.Port * 8 + i;
+                var currentState = value.IsSet(i);
+                var initChange = !portState[portPinNumber].HasValue;
+     
+                if (portState[portPinNumber] != currentState)
+                {
+                    portState[portPinNumber] = currentState;
+
+                    var pinState = new DigitalPinState(value.Port, portPinNumber, currentState, initChange);
+                    DigitalStateChangeReceived?.Invoke(session,pinState);
+                    //Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(i) ? 'X' : 'O', i, value.Pins);
+                }
+            }
         }
 
     }
@@ -61,5 +99,19 @@ namespace Arduino.Firmata.Protocol.Firmata
         /// Gets the received message.
         /// </summary>
         public T Value { get; private set; }
+    }
+    public class DigitalPinState
+    {
+        public DigitalPinState(int port, int portPinNumber, bool currentState, bool initChange)
+        {
+            this.Port = port;
+            this.PinNumber = portPinNumber;
+            this.Value = currentState;
+            this.InitChange = initChange;
+        }
+        public int Port { get; }
+        public int PinNumber { get; }
+        public bool Value { get; }
+        public bool InitChange { get; } = false;
     }
 }
