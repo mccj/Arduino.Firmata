@@ -46,6 +46,8 @@ namespace Arduino.Firmata.Protocol.String
                 Text = builder.ToString()
             };
 
+            messageHeader._arduinoSession.EvintString().OnStringReceived(new StringEventArgs(stringData.Text));
+
             return new FirmataMessage<StringData>(stringData);
         }
     }
