@@ -6,6 +6,7 @@
 		<Authors>mccj</Authors>
 		<PackageProjectUrl>https://github.com/mccj/Arduino.Firmata</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/mccj/Arduino.Firmata.git</RepositoryUrl>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 	</PropertyGroup>
 
 	<ItemGroup>
