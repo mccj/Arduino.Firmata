@@ -20,7 +20,8 @@ namespace Arduino.Firmata.Protocol.Firmata
     public class FirmataEvint
     {
         private ArduinoSession session;
-        private bool?[] portState = new bool?[256];
+        private bool?[] digitalPortState = new bool?[256];
+        private long?[] analogPortState = new long?[256];
 
         public FirmataEvint(ArduinoSession session)
         {
@@ -37,22 +38,15 @@ namespace Arduino.Firmata.Protocol.Firmata
         {
             AnalogStateReceived?.Invoke(session, eventArgs);
 
-            //var value = eventArgs.Value;
-            //for (int i = 0; i < 8; i++)
-            //{
-            //    var portPinNumber = value.Port * 8 + i;
-            //    var currentState = value.IsSet(i);
-            //    var initChange = !portState[portPinNumber].HasValue;
+            var value = eventArgs.Value;
+            var initChange = !analogPortState[value.Channel].HasValue;
 
-            //    if (portState[portPinNumber] != currentState)
-            //    {
-            //        portState[portPinNumber] = currentState;
+            if (analogPortState[value.Channel] != value.Level)
+            {
+                analogPortState[value.Channel] = value.Level;
 
-            //        var pinState = new DigitalPinState(value.Port, portPinNumber, currentState, initChange);
-            //        AnalogStateChangeReceived?.Invoke(session, pinState);
-            //        //Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(i) ? 'X' : 'O', i, value.Pins);
-            //    }
-            //}
+                AnalogStateChangeReceived?.Invoke(session, eventArgs);
+            }
         }
         internal void OnDigitalStateReceived(FirmataEventArgs<DigitalPortState> eventArgs)
         {
@@ -63,11 +57,11 @@ namespace Arduino.Firmata.Protocol.Firmata
             {
                 var portPinNumber = value.Port * 8 + i;
                 var currentState = value.IsSet(i);
-                var initChange = !portState[portPinNumber].HasValue;
+                var initChange = !digitalPortState[portPinNumber].HasValue;
      
-                if (portState[portPinNumber] != currentState)
+                if (digitalPortState[portPinNumber] != currentState)
                 {
-                    portState[portPinNumber] = currentState;
+                    digitalPortState[portPinNumber] = currentState;
 
                     var pinState = new DigitalPinState(value.Port, portPinNumber, currentState, initChange);
                     DigitalStateChangeReceived?.Invoke(session,pinState);
