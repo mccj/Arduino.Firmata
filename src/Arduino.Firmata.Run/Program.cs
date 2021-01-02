@@ -45,54 +45,57 @@ namespace Solid.Arduino.Run
                 //StepperTest(connection, session => { session.SetCNCShieldV3Board(); }, 4);
                 //StepperTest(connection, session => { session.SetRAMPSBoard(); }, 5);
 
+                //AnalogPinTest(connection);
+                //DigitalPinTest(connection);
+
                 StepperTest(connection, session =>
                 {
                     session.StepperConfiguration(0, new DeviceConfig
                     {
                         MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
-                        StepOrPin1Number = 27,
-                        DirectionOrPin2Number = 28,
-                        //EnablePinNumber = 4,
-                        //InvertEnablePinNumber = false
-                    });
-                    session.StepperConfiguration(1, new DeviceConfig
-                    {
-                        MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
-
-                        StepOrPin1Number = 4,
-                        DirectionOrPin2Number = 5,
-                        //EnablePinNumber = 8,
-                        //InvertEnablePinNumber = false
-                    });
-                    session.StepperConfiguration(2, new DeviceConfig
-                    {
-                        MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
-
-                        StepOrPin1Number = 8,
-                        DirectionOrPin2Number = 9,
-                        //EnablePinNumber = 10,
-                        //InvertEnablePinNumber = false
-                    });
-                    session.StepperConfiguration(3, new DeviceConfig
-                    {
-                        MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
-
                         StepOrPin1Number = 10,
-                        DirectionOrPin2Number = 11,
-                        //EnablePinNumber = 12,
-                        InvertStepOrPin1Number = true,
+                        DirectionOrPin2Number = 13,
+                        //EnablePinNumber = 11,
                         //InvertEnablePinNumber = false
                     });
-                    session.StepperConfiguration(4, new DeviceConfig
-                    {
-                        MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
+                    //session.StepperConfiguration(1, new DeviceConfig
+                    //{
+                    //    MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
 
-                        StepOrPin1Number = 12,
-                        DirectionOrPin2Number = 47,
-                        //EnablePinNumber = 12,
-                        //InvertEnablePinNumber = false
-                    });
-                }, 4);
+                    //    StepOrPin1Number = 10,
+                    //    //DirectionOrPin2Number = 13,
+                    //    //EnablePinNumber = 8,
+                    //    //InvertEnablePinNumber = false
+                    //});
+                    //session.StepperConfiguration(2, new DeviceConfig
+                    //{
+                    //    MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
+
+                    //    StepOrPin1Number = 11,
+                    //    //DirectionOrPin2Number = 13,
+                    //    //EnablePinNumber = 10,
+                    //    //InvertEnablePinNumber = false
+                    //});
+                    //session.StepperConfiguration(3, new DeviceConfig
+                    //{
+                    //    MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
+
+                    //    StepOrPin1Number = 12,
+                    //    //DirectionOrPin2Number = 13,
+                    //    //EnablePinNumber = 12,
+                    //    //InvertStepOrPin1Number = true,
+                    //    //InvertEnablePinNumber = false
+                    //});
+                    //session.StepperConfiguration(4, new DeviceConfig
+                    //{
+                    //    MotorInterface = DeviceConfig.MotorInterfaceType.Driver,
+
+                    //    StepOrPin1Number = 12,
+                    //    DirectionOrPin2Number = 47,
+                    //    //EnablePinNumber = 12,
+                    //    //InvertEnablePinNumber = false
+                    //});
+                }, 0);
 
                 //来回移动(connection, session =>
                 //{
@@ -122,7 +125,7 @@ namespace Solid.Arduino.Run
         {
             Console.WriteLine("正在搜索Arduino连接...");
             //var connection = new SerialConnection("COM4", 57600);
-            var connection = new SerialConnection("COM12", 115200);
+            var connection = new SerialConnection("COM4", 115200);
 
             //EnhancedSerialConnection.Find();
 
@@ -223,6 +226,173 @@ namespace Solid.Arduino.Run
 
 
         }
+        private static void AnalogPinTest(IDataConnection connection)
+        {
+            var session = new ArduinoSession(connection, timeOut: 5000);
+
+            //session.ResetBoard();
+            //session.MessageReceived += Session_OnMessageReceived;
+            var firmware = session.GetFirmware();//获取固件信息
+            Console.WriteLine($"固件: {firmware.Name} 版本 {firmware.MajorVersion}.{firmware.MinorVersion}");
+            var protocolVersion = session.GetProtocolVersion();//获取协议信息
+            Console.WriteLine($"Firmata协议版本 {protocolVersion.Major}.{protocolVersion.Minor}");
+
+            BoardCapability cap = session.GetBoardCapability();//开发板引脚支持的功能
+            Console.WriteLine();
+            Console.WriteLine("开发板引脚支持的功能:");
+
+            foreach (var pin in cap.Pins)
+            {
+                Console.WriteLine("引脚(Pin) {0}: 输入(Input): {1}, 输出(Output): {2}, (模拟信号)Analog: {3}, Analog-Res: {4}, 脉冲信号(PWM): {5}, PWM-Res: {6}, 伺服(Servo): {7}, Servo-Res: {8}, 串口(Serial): {9}, (编码器)Encoder: {10}, 输入上拉模式(Input-pullup): {11}",
+                    pin.PinNumber,
+                    pin.DigitalInput,
+                    pin.DigitalOutput,
+                    pin.Analog,
+                    pin.AnalogResolution,
+                    pin.Pwm,
+                    pin.PwmResolution,
+                    pin.Servo,
+                    pin.ServoResolution,
+                    pin.Serial,
+                    pin.Encoder,
+                    pin.InputPullup);
+            }
+            Console.WriteLine();
+
+            var analogMapping = session.GetBoardAnalogMapping();//模拟信道映射
+            Console.WriteLine("模拟信道映射:");
+
+            foreach (var mapping in analogMapping.PinMappings)
+            {
+                Console.WriteLine("通道 {0} 映射到管脚 {1}.", mapping.Channel, mapping.PinNumber);
+            }
+
+
+            session.ResetBoard();
+
+            //模拟信号控制
+            //session.SetDigitalPinMode(13, PinMode.PwmOutput);//设置引脚模式
+            //session.SetDigitalPin(13, 0);//设置输出
+            //session.SetDigitalPinMode(9, PinMode.PwmOutput);//设置引脚模式
+            //session.SetDigitalPin(9, 0);//设置输出
+
+
+            session.SetDigitalPinMode(0, PinMode.AnalogInput);//设置引脚模式
+            session.SetDigitalPinMode(1, PinMode.AnalogInput);//设置引脚模式
+            session.SetDigitalPinMode(2, PinMode.AnalogInput);//设置引脚模式
+
+            //session.CreateAnalogStateMonitor().Subscribe(new eeee2("无"));//设置监控调用
+            session.CreateAnalogStateChangeMonitor().Monitor(f =>
+            {
+                Console.WriteLine("通道 {0} 值 {1}", f.Channel, f.Level);
+            });//设置数字信号输入监控调用
+
+            session.SetAnalogReportMode(0, true);
+            session.SetAnalogReportMode(1, true);
+            session.SetAnalogReportMode(2, true);
+
+            ////session.CreateDigitalStateMonitor().PortStateChange(f =>
+            ////{
+            ////    Console.WriteLine("端口 {0} Pin {1} 的数字电平: {2} 是否第一次初始化 {3}", f.Port, f.PinNumber, f.Value ? 'X' : 'O', f.InitChange);
+            ////});//设置数字信号输入监控调用
+            //session.CreateDigitalStateChangeMonitor().Monitor(f =>
+            //{
+            //    Console.WriteLine("端口 {0} Pin {1} 的数字电平: {2} 是否第一次初始化 {3}", f.Port, f.PinNumber, f.Value ? 'X' : 'O', f.InitChange);
+            //});//设置数字信号输入监控调用
+
+            //session.SetDigitalReportMode(0, true);//设置监控报告
+            //session.SetDigitalReportMode(1, true);//设置监控报告
+            //System.Threading.Thread.Sleep(1000);
+            //session.CreateDigitalStateMonitor().Subscribe(new eeee1("无"));//设置数字信号输入监控调用
+
+
+            while (true)
+            {
+                Console.WriteLine("请输入数字，Q退出");
+                var r = Console.ReadLine();
+                if (r.Equals("Q", StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+                //if (r.Equals("Z", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    for (int i = 0; i <= stepperCount; i++)
+                //    {
+                //        session.StepperZero(i);
+                //        session.请求报告步进位置(i);
+                //    }
+                //}
+                //else
+                //{
+                //    int.TryParse(r, out var n);
+                //    for (int i = 0; i <= stepperCount; i++)
+                //    {
+                //        session.StepperMove(i, n);
+                //    }
+                //}
+            }
+        }
+        private static void DigitalPinTest(IDataConnection connection)
+        {
+            var session = new ArduinoSession(connection, timeOut: 5000);
+
+            //session.ResetBoard();
+            //session.MessageReceived += Session_OnMessageReceived;
+            var firmware = session.GetFirmware();//获取固件信息
+            Console.WriteLine($"固件: {firmware.Name} 版本 {firmware.MajorVersion}.{firmware.MinorVersion}");
+            var protocolVersion = session.GetProtocolVersion();//获取协议信息
+            Console.WriteLine($"Firmata协议版本 {protocolVersion.Major}.{protocolVersion.Minor}");
+            session.ResetBoard();
+
+            session.SetDigitalPinMode(8, PinMode.DigitalInput);//设置引脚模式
+            session.SetDigitalPinMode(7, PinMode.DigitalInput);//设置引脚模式
+            session.SetDigitalPinMode(6, PinMode.DigitalInput);//设置引脚模式
+            session.SetDigitalPinMode(5, PinMode.DigitalInput);//设置引脚模式
+            session.SetDigitalPinMode(4, PinMode.DigitalInput);//设置引脚模式
+            session.SetDigitalPinMode(3, PinMode.DigitalInput);//设置引脚模式
+
+
+            //session.CreateDigitalStateMonitor().PortStateChange(f =>
+            //{
+            //    Console.WriteLine("端口 {0} Pin {1} 的数字电平: {2} 是否第一次初始化 {3}", f.Port, f.PinNumber, f.Value ? 'X' : 'O', f.InitChange);
+            //});//设置数字信号输入监控调用
+            session.CreateDigitalStateChangeMonitor().Monitor(f =>
+            {
+                Console.WriteLine("端口 {0} Pin {1} 的数字电平: {2} 是否第一次初始化 {3}", f.Port, f.PinNumber, f.Value ? 'X' : 'O', f.InitChange);
+            });//设置数字信号输入监控调用
+
+            session.SetDigitalReportMode(0, true);//设置监控报告
+            session.SetDigitalReportMode(1, true);//设置监控报告
+                                                  //System.Threading.Thread.Sleep(1000);
+                                                  //session.CreateDigitalStateMonitor().Subscribe(new eeee1("无"));//设置数字信号输入监控调用
+
+
+            while (true)
+            {
+                Console.WriteLine("请输入数字，Q退出");
+                var r = Console.ReadLine();
+                if (r.Equals("Q", StringComparison.OrdinalIgnoreCase))
+                {
+                    return;
+                }
+                //if (r.Equals("Z", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    for (int i = 0; i <= stepperCount; i++)
+                //    {
+                //        session.StepperZero(i);
+                //        session.请求报告步进位置(i);
+                //    }
+                //}
+                //else
+                //{
+                //    int.TryParse(r, out var n);
+                //    for (int i = 0; i <= stepperCount; i++)
+                //    {
+                //        session.StepperMove(i, n);
+                //    }
+                //}
+            }
+        }
 
         private static void 来回移动(IDataConnection connection, Action<ArduinoSession> action, int stepperNo, int iii)
         {
@@ -239,18 +409,27 @@ namespace Solid.Arduino.Run
             var bb1 = true;
             var bb2 = true;
             ////步进电机
-            session.CreateReceivedStringMonitor().Monitor(f =>
-            {
-            });
-            session.CreateStepperMoveCompleteMonitor().Monitor(f =>
+            //session.CreateReceivedStringMonitor().Monitor(f =>
+            //{
+            //});
+            //session.CreateStepperMoveCompleteMonitor().Monitor(f =>
+            //{
+            //    System.Threading.Thread.Sleep(1000);
+            //    bb2 = !bb2;
+            //    session.StepperMove(stepperNo, bb2 ? -iii : iii);
+            //    Console.WriteLine("步进电机: {0}, 驱动器编号: {1},驱动器: {2}", f, f.DeviceNumber, f.StepsNum);
+            //});
+            ////session.CreateStepperMoveCompleteMonitor().Subscribe(new eeee3("步进完成"));
+            //session.CreateStepperPositionMonitor().Subscribe(new eeee3("步进汇报"));
+            session.CreateDigitalStateChangeMonitor().Monitor(f =>
             {
                 System.Threading.Thread.Sleep(1000);
                 bb2 = !bb2;
                 session.StepperMove(stepperNo, bb2 ? -iii : iii);
-                Console.WriteLine("步进电机: {0}, 驱动器编号: {1},驱动器: {2}", f, f.DeviceNumber, f.StepsNum);
-            });
-            //session.CreateStepperMoveCompleteMonitor().Subscribe(new eeee3("步进完成"));
-            session.CreateStepperPositionMonitor().Subscribe(new eeee3("步进汇报"));
+                //Console.WriteLine("步进电机: {0}, 驱动器编号: {1},驱动器: {2}", f, f.DeviceNumber, f.StepsNum);
+                //Console.WriteLine("端口 {0} Pin {1} 的数字电平: {2}", f.Port, f.PinNumber, f.Value ? 'X' : 'O');
+            });//设置数字信号输入监控调用
+
 
             //session.SetRAMPSBoard();
             //session.SetCNCShieldV3Board();
@@ -283,26 +462,30 @@ namespace Solid.Arduino.Run
         {
             var session = new ArduinoSession(connection, timeOut: 5000);
 
+            session.CreateReceivedStringMonitor().Monitor(f =>
+            {
+                Console.WriteLine($"字符串输出 {f}");
+            });
             //session.ResetBoard();
-            //session.MessageReceived += Session_OnMessageReceived;
+            session.MessageReceived += Session_OnMessageReceived;
             var firmware = session.GetFirmware();//获取固件信息
             Console.WriteLine($"固件: {firmware.Name} 版本 {firmware.MajorVersion}.{firmware.MinorVersion}");
             var protocolVersion = session.GetProtocolVersion();//获取协议信息
             Console.WriteLine($"Firmata协议版本 {protocolVersion.Major}.{protocolVersion.Minor}");
             session.ResetBoard();
 
-            session.SetDigitalPinMode(2, PinMode.DigitalInput);//设置引脚模式
-            session.SetDigitalPinMode(3, PinMode.DigitalInput);//设置引脚模式
-            session.SetDigitalPinMode(18, PinMode.DigitalInput);//设置引脚模式
-            session.SetDigitalPinMode(19, PinMode.DigitalInput);//设置引脚模式
-            session.SetDigitalPinMode(29, PinMode.DigitalInput);//设置引脚模式
-            session.SetDigitalPinMode(39, PinMode.DigitalInput);//设置引脚模式
-            session.SetDigitalPinMode(30, PinMode.DigitalInput);//设置引脚模式
-            session.SetDigitalPinMode(31, PinMode.DigitalInput);//设置引脚模式
+            //session.SetDigitalPinMode(2, PinMode.DigitalInput);//设置引脚模式
+            //session.SetDigitalPinMode(3, PinMode.DigitalInput);//设置引脚模式
+            //session.SetDigitalPinMode(18, PinMode.DigitalInput);//设置引脚模式
+            //session.SetDigitalPinMode(19, PinMode.DigitalInput);//设置引脚模式
+            //session.SetDigitalPinMode(29, PinMode.DigitalInput);//设置引脚模式
+            //session.SetDigitalPinMode(39, PinMode.DigitalInput);//设置引脚模式
+            //session.SetDigitalPinMode(30, PinMode.DigitalInput);//设置引脚模式
+            //session.SetDigitalPinMode(31, PinMode.DigitalInput);//设置引脚模式
 
-            session.CreateDigitalStateMonitor().Subscribe(new eeee1("无"));//设置数字信号输入监控调用
-            session.SetDigitalReportMode(0, true);//设置监控报告
-            //session.SetDigitalReportMode(1, true);
+            //session.CreateDigitalStateMonitor().Subscribe(new eeee1("无"));//设置数字信号输入监控调用
+            //session.SetDigitalReportMode(0, true);//设置监控报告
+            ////session.SetDigitalReportMode(1, true);
 
 
             ////步进电机
@@ -316,7 +499,7 @@ namespace Solid.Arduino.Run
             //session.SetRAMPSBoard();
             //session.SetCNCShieldV3Board();
             action(session);
-            for (int i = 0; i < stepperCount; i++)
+            for (int i = 0; i <= stepperCount; i++)
             {
                 session.StepperEnable(i, true);
                 session.StepperEnable(i, false);
@@ -504,16 +687,30 @@ namespace Solid.Arduino.Run
             {
                 //throw new NotImplementedException();
             }
-
+            private bool[] sss = new bool[1000];
             public void OnNext(DigitalPortState value)
             {
-                Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(0) ? 'X' : 'O', 0, value.Pins);
-                Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(1) ? 'X' : 'O', 1, value.Pins);
-                Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(2) ? 'X' : 'O', 2, value.Pins);
-                Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(3) ? 'X' : 'O', 3, value.Pins);
-                Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(4) ? 'X' : 'O', 4, value.Pins);
-                Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(6) ? 'X' : 'O', 6, value.Pins);
-                Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(7) ? 'X' : 'O', 7, value.Pins);
+                for (int i = 0; i < 8; i++)
+                {
+                    var d1 = value.Port * 8 + i;
+                    var v = value.IsSet(i);
+                    if (sss[d1] != v)
+                    {
+                        sss[d1] = v;
+                        Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(i) ? 'X' : 'O', i, value.Pins);
+                    }
+                }
+
+
+
+                //Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(0) ? 'X' : 'O', 0, value.Pins);
+                //Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(1) ? 'X' : 'O', 1, value.Pins);
+                //Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(2) ? 'X' : 'O', 2, value.Pins);
+                //Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(3) ? 'X' : 'O', 3, value.Pins);
+                //Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(4) ? 'X' : 'O', 4, value.Pins);
+                //Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(5) ? 'X' : 'O', 5, value.Pins);
+                //Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(6) ? 'X' : 'O', 6, value.Pins);
+                //Console.WriteLine("A_端口 {0} 的数字电平: {1}-{2}-{3}", value.Port, value.IsSet(7) ? 'X' : 'O', 7, value.Pins);
             }
         }
         public class eeee2 : IObserver<AnalogState>
@@ -611,10 +808,12 @@ namespace Solid.Arduino.Run
 
         static void Session_OnMessageReceived(object sender, FirmataMessageEventArgs eventArgs)
         {
-            if (eventArgs.Value.Value is global::Arduino.Firmata.Protocol.String.StringData aaa)
-            {
+            Console.WriteLine("Time:{0} MessageType {1} received: {2}", eventArgs.Value.Time, eventArgs.Value.Name, eventArgs.Value.Value);
 
-            }
+            //if (eventArgs.Value.Value is global::Arduino.Firmata.Protocol.String.StringData aaa)
+            //{
+
+            //}
             //string o;
 
             //switch (eventArgs.Value.Type)

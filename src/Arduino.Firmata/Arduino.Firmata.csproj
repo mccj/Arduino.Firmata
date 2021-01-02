@@ -3,12 +3,14 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0;net461</TargetFrameworks>
 		<LangVersion>8.0</LangVersion>
-		<Version>1.0.1-beta-1</Version>
+		<Version>1.0.1-beta-2</Version>
 		<Authors>mccj</Authors>
 		<PackageProjectUrl>https://github.com/mccj/Arduino.Firmata</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/mccj/Arduino.Firmata.git</RepositoryUrl>
 		<PackageTags>Arduino Firmata</PackageTags>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Description>Client library built on .NET Core and providing an easy way to interact with Arduino boards.
+The library implements the serial ASCII, Firmata and I2C protocols, which can be used simultaneously.</Description>
 		<!--<VersionSuffix>1.0.2.0-Beta-$([System.DateTime]::UtcNow.ToString(yyyyMMddHHmmssffff))</VersionSuffix>
 		<Version Condition=" '$(VersionSuffix)' == '' ">1.0.2.0</Version>
 		<Version Condition=" '$(VersionSuffix)' != '' ">$(VersionSuffix)</Version>-->
