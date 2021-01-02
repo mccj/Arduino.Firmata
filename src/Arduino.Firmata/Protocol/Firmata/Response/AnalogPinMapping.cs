@@ -14,5 +14,9 @@
         /// Gets the board's pin number (0 - 127).
         /// </summary>
         public int PinNumber { get; internal set; }
+        public override string ToString()
+        {
+            return $"Channel {Channel} PinNumber = {PinNumber}";
+        }
     }
 }
