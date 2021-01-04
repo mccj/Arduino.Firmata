@@ -88,7 +88,13 @@ namespace System.Linq
             if (deviceConfig.EnablePinNumber.HasValue)
                 command.Add((byte)deviceConfig.EnablePinNumber);
 
-            command.Add((byte)((deviceConfig.InvertEnablePinNumber ? 1 : 0 << 1) | (deviceConfig.InvertPin4Number ? 1 : 0) << 1 | (deviceConfig.InvertPin3Number ? 1 : 0) << 1 | (deviceConfig.InvertDirectionOrPin2Number ? 1 : 0) << 1 | (deviceConfig.InvertStepOrPin1Number ? 1 : 0)));
+            // var wireCount = (motorInterface & 0x70) >> 4;
+            if (deviceConfig.MotorInterface == DeviceConfig.MotorInterfaceType.Driver)
+                // setPinsInverted(directionInvert,stepInvert,enableInvert)
+                command.Add((byte)((deviceConfig.InvertEnablePinNumber ? 1 : 0 << 1) | (deviceConfig.InvertPin4Number ? 1 : 0) << 1 | (deviceConfig.InvertPin3Number ? 1 : 0) << 1 | (deviceConfig.InvertStepOrPin1Number ? 1 : 0) << 1 | (deviceConfig.InvertDirectionOrPin2Number ? 1 : 0)));
+            else
+                // setPinsInverted(pin1Invert,pin2Invert,pin3Invert,pin4Invert,enableInvert)
+                command.Add((byte)((deviceConfig.InvertEnablePinNumber ? 1 : 0 << 1) | (deviceConfig.InvertPin4Number ? 1 : 0) << 1 | (deviceConfig.InvertPin3Number ? 1 : 0) << 1 | (deviceConfig.InvertDirectionOrPin2Number ? 1 : 0) << 1 | (deviceConfig.InvertStepOrPin1Number ? 1 : 0)));
             command.Add(Utility.SysExEnd);
             session.Write(command.ToArray(), 0, command.Count);
         }
