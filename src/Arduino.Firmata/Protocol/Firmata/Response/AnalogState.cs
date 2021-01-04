@@ -17,5 +17,9 @@
         /// Gets the analog level.
         /// </summary>
         public long Level { get; internal set; }
+        public override string ToString()
+        {
+            return $"Channel {Channel} Level = {Level}";
+        }
     }
 }
