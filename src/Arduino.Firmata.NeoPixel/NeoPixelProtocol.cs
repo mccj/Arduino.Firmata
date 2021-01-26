@@ -196,17 +196,17 @@ gamma32			KEYWORD2
         public const byte NEOPIXEL_SET_PIN = 0x08;
         public const byte NEOPIXEL_SET_BRIGHTNESS = 0x09;
 
-        public const byte ACCELSTEPPER_MOVE_COMPLETE = 0x0a;
-        public const byte ACCELSTEPPER_MOVE_COMPLETE1 = 0x0b;
-        public const byte ACCELSTEPPER_MOVE_COMPLETE2 = 0x0c;
-        public const byte ACCELSTEPPER_MOVE_COMPLETE3 = 0x0d;
-        public const byte ACCELSTEPPER_MOVE_COMPLETE4 = 0x0e;
-        public const byte ACCELSTEPPER_MOVE_COMPLETE5 = 0x0f;
-        public const byte ACCELSTEPPER_MOVE_COMPLETE6 = 0x10;
-        public const byte ACCELSTEPPER_MOVE_COMPLETE7 = 0x11;
-        public const byte ACCELSTEPPER_MOVE_COMPLETE8 = 0x12;
-        public const byte ACCELSTEPPER_MOVE_COMPLETE9 = 0x13;
-        public const byte ACCELSTEPPER_MOVE_COMPLETE10 = 0x14;
+        public const byte NEOPIXEL_REPORT_CAN_SHOW = 0x0a;
+        public const byte NEOPIXEL_REPORT_COMPLETE1 = 0x0b;
+        public const byte NEOPIXEL_REPORT_GET_BRIGHTNESS = 0x0c;
+        public const byte NEOPIXEL_REPORT_GET_PIN = 0x0d;
+        public const byte NEOPIXEL_REPORT_COMPLETE4 = 0x0e;
+        public const byte NEOPIXEL_REPORT_GET_PIXEL_COLOR = 0x0f;
+        public const byte NEOPIXEL_REPORT_SINE8 = 0x10;
+        public const byte NEOPIXEL_REPORT_GAMMA8 = 0x11;
+        public const byte NEOPIXEL_REPORT_GAMMA32 = 0x12;
+        public const byte NEOPIXEL_REPORT_COLOR = 0x13;
+        public const byte NEOPIXEL_REPORT_COLORHSV = 0x14;
 
         public static void NeoPixelConfiguration(this ArduinoSession session, int deviceNumber)
         {
@@ -481,7 +481,7 @@ gamma32			KEYWORD2
             {
                 Utility.SysExStart,
                 NEOPIXEL_DATA,
-                ACCELSTEPPER_MOVE_COMPLETE,
+                NEOPIXEL_REPORT_CAN_SHOW,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
                 Utility.SysExEnd
             };
@@ -497,7 +497,7 @@ gamma32			KEYWORD2
         //    {
         //        Utility.SysExStart,
         //        NEOPIXEL_DATA,
-        //        ACCELSTEPPER_MOVE_COMPLETE1,
+        //        NEOPIXEL_REPORT_COMPLETE1,
         //        (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
         //        Utility.SysExEnd
         //    };
@@ -513,7 +513,7 @@ gamma32			KEYWORD2
             {
                 Utility.SysExStart,
                 NEOPIXEL_DATA,
-                ACCELSTEPPER_MOVE_COMPLETE2,
+                NEOPIXEL_REPORT_GET_BRIGHTNESS,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
                 Utility.SysExEnd
             };
@@ -529,7 +529,7 @@ gamma32			KEYWORD2
             {
                 Utility.SysExStart,
                 NEOPIXEL_DATA,
-                ACCELSTEPPER_MOVE_COMPLETE3,
+                NEOPIXEL_REPORT_GET_PIN,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
                 Utility.SysExEnd
             };
@@ -551,7 +551,7 @@ gamma32			KEYWORD2
             {
                 Utility.SysExStart,
                 NEOPIXEL_DATA,
-                ACCELSTEPPER_MOVE_COMPLETE4,
+                NEOPIXEL_REPORT_COMPLETE4,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
                 Utility.SysExEnd
             };
@@ -575,7 +575,7 @@ gamma32			KEYWORD2
             {
                 Utility.SysExStart,
                 NEOPIXEL_DATA,
-                ACCELSTEPPER_MOVE_COMPLETE5,
+                NEOPIXEL_REPORT_GET_PIXEL_COLOR,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
                 bytes[0], //4  num steps, bits 0-6
                 bytes[1], //5  num steps, bits 7-13
@@ -597,7 +597,7 @@ gamma32			KEYWORD2
             {
                 Utility.SysExStart,
                 NEOPIXEL_DATA,
-                ACCELSTEPPER_MOVE_COMPLETE6,
+                NEOPIXEL_REPORT_SINE8,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
                 x,
                 Utility.SysExEnd
@@ -622,7 +622,7 @@ gamma32			KEYWORD2
             {
                 Utility.SysExStart,
                 NEOPIXEL_DATA,
-                ACCELSTEPPER_MOVE_COMPLETE7,
+                NEOPIXEL_REPORT_GAMMA8,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
                 x,
                 Utility.SysExEnd
@@ -658,7 +658,7 @@ gamma32			KEYWORD2
             {
               Utility.SysExStart,
               NEOPIXEL_DATA,
-              ACCELSTEPPER_MOVE_COMPLETE8,
+              NEOPIXEL_REPORT_GAMMA32,
               (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
               bytes[0], //4  num steps, bits 0-6
               bytes[1], //5  num steps, bits 7-13
@@ -690,7 +690,7 @@ gamma32			KEYWORD2
           {
               Utility.SysExStart,
               NEOPIXEL_DATA,
-              ACCELSTEPPER_MOVE_COMPLETE9,
+              NEOPIXEL_REPORT_COLOR,
               (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
               (byte)red,
               (byte)green,
@@ -725,7 +725,7 @@ gamma32			KEYWORD2
             {
               Utility.SysExStart,
               NEOPIXEL_DATA,
-              ACCELSTEPPER_MOVE_COMPLETE8,
+              NEOPIXEL_REPORT_COLORHSV,
               (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
               bytes[0], //4  num steps, bits 0-6
               bytes[1], //5  num steps, bits 7-13

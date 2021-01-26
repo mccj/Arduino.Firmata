@@ -22,27 +22,27 @@ namespace Arduino.Firmata.Protocol.NeoPixel
         {
             var messageByte = (byte)messageHeader.MessageBuffer[1];
             var messageByte2 = (byte)messageHeader.MessageBuffer[2];
-            if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE)
+            if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_CAN_SHOW)
                 return CanShow(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE1)
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_COMPLETE1)
                 return GetPixels(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE2)
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GET_BRIGHTNESS)
                 return GetBrightness(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE3)
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GET_PIN)
                 return GetPin(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE4)
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_COMPLETE4)
                 return NumPixels(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE5)
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GET_PIXEL_COLOR)
                 return GetPixelColor(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE6)
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_SINE8)
                 return GetSine8(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE7)
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GAMMA8)
                 return GetGamma8(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE8)
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GAMMA32)
                 return GetGamma32(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE9)
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_COLOR)
                 return Color(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE10)
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_COLORHSV)
                 return ColorHSV(messageHeader);
             else
                 throw new NotImplementedException();
