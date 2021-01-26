@@ -18,6 +18,7 @@ namespace Solid.Arduino.Run
     {
         static void Main(string[] args)
         {
+            //var s=  NumberExtensions.decode32BitSignedInteger(0, 20, 0, 0, 0);
             //var _serial = new System.IO.Ports.SerialPort("COM9", 57600/*, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One*/);
 
             //_serial.DataReceived += (a, b) =>
@@ -235,11 +236,11 @@ namespace Solid.Arduino.Run
             var firmware = session.GetFirmware();//获取固件信息
             var protocolVersion = session.GetProtocolVersion();//获取协议信息
 
-            //session.NeoPixelConfiguration(0, 64, 7);
-            session.NeoPixelConfiguration(0);
-            session.NeoPixelSetPin(0, 6);
-            session.NeoPixelUpdateLength(0, 64);
-            session.NeoPixelUpdateType(0, NeoPixelType.NEO_GRB | NeoPixelType.NEO_KHZ800);
+            session.NeoPixelConfiguration(0, 16, 6);
+            //session.NeoPixelConfiguration(0);
+            //session.NeoPixelSetPin(0, 6);
+            //session.NeoPixelUpdateLength(0, 2560);
+            //session.NeoPixelUpdateType(0, NeoPixelType.NEO_GRB | NeoPixelType.NEO_KHZ800);
             session.NeoPixelBegin(0);
             session.NeoPixelClear(0);
             //session.NeoPixelConfiguration(1, 64);
@@ -248,6 +249,23 @@ namespace Solid.Arduino.Run
             session.NeoPixelSetPixelColor(0, 3, System.Drawing.Color.White.ToArgb());
             session.NeoPixelFill(0, System.Drawing.Color.DarkBlue, 4, 4);
             session.NeoPixelSetBrightness(0, 10);
+            session.NeoPixelShow(0);
+
+            var s = System.Drawing.Color.Red.ToArgb();
+            var s1 = session.NeoPixelGetBrightness(0);
+            var s2 = session.NeoPixelCanShow(0);
+            var s3 = session.NeoPixelGetPin(0);
+            var s4 = session.NeoPixelNumPixels(0);
+
+            var s5 = session.NeoPixelGetPixelColor(0, 2);
+            var s6 = session.NeoPixelSine8(0, 5);
+            var s7 = session.NeoPixelGamma8(0, 5);
+            var s8 = session.NeoPixelGamma32(0, 5);
+            var s9 = session.NeoPixelColor(0, 255, 0, 0);
+            var s10 = session.NeoPixelColor(0, 255, 0, 0, 5);
+            //var s11 = session.NeoPixelColorHSV(0, 5, 5, 5);
+
+            session.NeoPixelSetPixelColor(0, 8, s9.Value);
             session.NeoPixelShow(0);
         }
         private static void test1(IDataConnection connection)

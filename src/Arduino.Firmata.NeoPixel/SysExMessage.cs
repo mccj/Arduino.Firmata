@@ -13,60 +13,174 @@ namespace Arduino.Firmata.Protocol.NeoPixel
         public bool CanHeader(byte messageByte)
         {
             var ss = new[] {
-                AccelStepperProtocol.ACCELSTEPPER_DATA
+                NeoPixelProtocol.NEOPIXEL_DATA
             };
             return ss.Contains(messageByte);
         }
 
         public IFirmataMessage Header(MessageHeader messageHeader)
         {
-            //var messageByte = (byte)messageHeader.MessageBuffer[1];
-            //var messageByte2 = (byte)messageHeader.MessageBuffer[2];
-            //if (messageByte == AccelStepperProtocol.ACCELSTEPPER_DATA && messageByte2 == 0x06)
-            //    return CreateStepperPositionResponse(messageHeader);//步进报告位置
-            //else if (messageByte == AccelStepperProtocol.ACCELSTEPPER_DATA && messageByte2 == 0x0a)
-            //    return CreateStepperMoveCompleteResponse(messageHeader);//步进移动完成
-            //else if (messageByte == AccelStepperProtocol.ACCELSTEPPER_DATA && messageByte2 == 0x24)
-            //    return CreateMultiStepperMoveCompelteResponse(messageHeader);//批量步进移动完成
-            //else
+            var messageByte = (byte)messageHeader.MessageBuffer[1];
+            var messageByte2 = (byte)messageHeader.MessageBuffer[2];
+            if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE)
+                return CanShow(messageHeader);
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE1)
+                return GetPixels(messageHeader);
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE2)
+                return GetBrightness(messageHeader);
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE3)
+                return GetPin(messageHeader);
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE4)
+                return NumPixels(messageHeader);
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE5)
+                return GetPixelColor(messageHeader);
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE6)
+                return GetSine8(messageHeader);
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE7)
+                return GetGamma8(messageHeader);
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE8)
+                return GetGamma32(messageHeader);
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE9)
+                return Color(messageHeader);
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.ACCELSTEPPER_MOVE_COMPLETE10)
+                return ColorHSV(messageHeader);
+            else
                 throw new NotImplementedException();
         }
-        //private StepperPosition GetStepperPosition(MessageHeader messageHeader)
-        //{
-        //    var deviceNumber = messageHeader.MessageBuffer[3];
-        //    var stepsNum = NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7], (byte)messageHeader.MessageBuffer[8]);
+        private IFirmataMessage CanShow(MessageHeader messageHeader)
+        {
+            var deviceNumber = messageHeader.MessageBuffer[3];
+            var value = Convert.ToBoolean(messageHeader.MessageBuffer[4]);
 
-        //    var currentState = new StepperPosition
-        //    {
-        //        DeviceNumber = deviceNumber,
-        //        StepsNum = stepsNum
-        //    };
-        //    return currentState;
-        //}
-        ///// <summary>
-        ///// 步进报告位置
-        ///// </summary>
-        ///// <param name="messageHeader"></param>
-        ///// <returns></returns>
-        //private IFirmataMessage CreateStepperPositionResponse(MessageHeader messageHeader)
-        //{
-        //    var currentState = GetStepperPosition(messageHeader);
-        //    messageHeader._arduinoSession.EvintAccelStepper().OnStepperPositionReceived(new FirmataEventArgs<StepperPosition>(currentState));
-        //    return new FirmataMessage<StepperPosition>(currentState);
-        //}
-        //private IFirmataMessage CreateStepperMoveCompleteResponse(MessageHeader messageHeader)
-        //{
-        //    var currentState = GetStepperPosition(messageHeader);
-        //    messageHeader._arduinoSession.EvintAccelStepper().OnStepperMoveCompleteReceived(new FirmataEventArgs<StepperPosition>(currentState));
-        //    return new FirmataMessage<StepperPosition>(currentState);
-        //}
-        //private IFirmataMessage CreateMultiStepperMoveCompelteResponse(MessageHeader messageHeader)
-        //{
-        //    var groupNumber = messageHeader.MessageBuffer[3];
+            var currentState = new CanShow
+            {
+                DeviceNumber = deviceNumber,
+                Value = value
+            };
+            return new FirmataMessage<CanShow>(currentState);
+        }
+        private IFirmataMessage GetPixels(MessageHeader messageHeader)
+        {
+            //var deviceNumber = messageHeader.MessageBuffer[3];
+            //var value = Convert.ToBoolean(messageHeader.MessageBuffer[4]);
 
-        //    var currentState = groupNumber;
-        //    messageHeader._arduinoSession.EvintAccelStepper().OnMultiStepperMoveCompelteReceived(new FirmataEventArgs<int>(currentState));
-        //    return new FirmataMessage<int>(currentState);
-        //}
+            //var currentState = new CanShow
+            //{
+            //    DeviceNumber = deviceNumber,
+            //    Value = value
+            //};
+            //return new FirmataMessage<CanShow>(currentState);
+            throw new Exception("功能未实现");
+        }
+        private IFirmataMessage GetBrightness(MessageHeader messageHeader)
+        {
+            var deviceNumber = messageHeader.MessageBuffer[3];
+            var value = (byte)messageHeader.MessageBuffer[4];
+
+            var currentState = new Brightness
+            {
+                DeviceNumber = deviceNumber,
+                Value = value
+            };
+            return new FirmataMessage<Brightness>(currentState);
+        }
+        private IFirmataMessage GetPin(MessageHeader messageHeader)
+        {
+            var deviceNumber = messageHeader.MessageBuffer[3];
+            var value = (byte)messageHeader.MessageBuffer[4];
+
+            var currentState = new Pin
+            {
+                DeviceNumber = deviceNumber,
+                Value = value
+            };
+            return new FirmataMessage<Pin>(currentState);
+        }
+        private IFirmataMessage NumPixels(MessageHeader messageHeader)
+        {
+            var deviceNumber = messageHeader.MessageBuffer[3];
+            var value = (int)NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7], (byte)messageHeader.MessageBuffer[8]);
+
+            var currentState = new NumPixels
+            {
+                DeviceNumber = deviceNumber,
+                Value = value
+            };
+            return new FirmataMessage<NumPixels>(currentState);
+        }
+
+        private IFirmataMessage GetPixelColor(MessageHeader messageHeader)
+        {
+            var deviceNumber = messageHeader.MessageBuffer[3];
+            var value = (int)NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7], (byte)messageHeader.MessageBuffer[8]);
+
+            var currentState = new GetPixelColor
+            {
+                DeviceNumber = deviceNumber,
+                Value = value
+            };
+            return new FirmataMessage<GetPixelColor>(currentState);
+        }
+
+        private IFirmataMessage GetSine8(MessageHeader messageHeader)
+        {
+            var deviceNumber = messageHeader.MessageBuffer[3];
+            var value = (byte)messageHeader.MessageBuffer[4];
+
+            var currentState = new Sine8
+            {
+                DeviceNumber = deviceNumber,
+                Value = value
+            };
+            return new FirmataMessage<Sine8>(currentState);
+        }
+        private IFirmataMessage GetGamma8(MessageHeader messageHeader)
+        {
+            var deviceNumber = messageHeader.MessageBuffer[3];
+            var value = (byte)messageHeader.MessageBuffer[4];
+
+            var currentState = new Gamma8
+            {
+                DeviceNumber = deviceNumber,
+                Value = value
+            };
+            return new FirmataMessage<Gamma8>(currentState);
+        }
+        private IFirmataMessage GetGamma32(MessageHeader messageHeader)
+        {
+            var deviceNumber = messageHeader.MessageBuffer[3];
+            var value = (int)NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7], (byte)messageHeader.MessageBuffer[8]);
+
+            var currentState = new Gamma32
+            {
+                DeviceNumber = deviceNumber,
+                Value = value
+            };
+            return new FirmataMessage<Gamma32>(currentState);
+        }
+        private IFirmataMessage Color(MessageHeader messageHeader)
+        {
+            var deviceNumber = messageHeader.MessageBuffer[3];
+            var value = (int)NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7], (byte)messageHeader.MessageBuffer[8]);
+
+            var currentState = new PixelColor
+            {
+                DeviceNumber = deviceNumber,
+                Value = value
+            };
+            return new FirmataMessage<PixelColor>(currentState);
+        }
+        private IFirmataMessage ColorHSV(MessageHeader messageHeader)
+        {
+            var deviceNumber = messageHeader.MessageBuffer[3];
+            var value = (int)NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7], (byte)messageHeader.MessageBuffer[8]);
+
+            var currentState = new ColorHSV
+            {
+                DeviceNumber = deviceNumber,
+                Value = value
+            };
+            return new FirmataMessage<ColorHSV>(currentState);
+        }
     }
 }

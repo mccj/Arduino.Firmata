@@ -196,6 +196,18 @@ gamma32			KEYWORD2
         public const byte NEOPIXEL_SET_PIN = 0x08;
         public const byte NEOPIXEL_SET_BRIGHTNESS = 0x09;
 
+        public const byte ACCELSTEPPER_MOVE_COMPLETE = 0x0a;
+        public const byte ACCELSTEPPER_MOVE_COMPLETE1 = 0x0b;
+        public const byte ACCELSTEPPER_MOVE_COMPLETE2 = 0x0c;
+        public const byte ACCELSTEPPER_MOVE_COMPLETE3 = 0x0d;
+        public const byte ACCELSTEPPER_MOVE_COMPLETE4 = 0x0e;
+        public const byte ACCELSTEPPER_MOVE_COMPLETE5 = 0x0f;
+        public const byte ACCELSTEPPER_MOVE_COMPLETE6 = 0x10;
+        public const byte ACCELSTEPPER_MOVE_COMPLETE7 = 0x11;
+        public const byte ACCELSTEPPER_MOVE_COMPLETE8 = 0x12;
+        public const byte ACCELSTEPPER_MOVE_COMPLETE9 = 0x13;
+        public const byte ACCELSTEPPER_MOVE_COMPLETE10 = 0x14;
+
         public static void NeoPixelConfiguration(this ArduinoSession session, int deviceNumber)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
@@ -292,7 +304,7 @@ gamma32			KEYWORD2
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
             if (ledCount < 0)
                 throw new ArgumentOutOfRangeException(nameof(ledCount), "ledCount must be between 0.");
-            
+
             var bytes = ledCount.encode32BitSignedInteger();
             var command = new[]
             {
@@ -460,22 +472,22 @@ gamma32			KEYWORD2
             };
             session.Write(command, 0, command.Length);
         }
-        //public static bool NeoPixelCanShow(this ArduinoSession session, int deviceNumber)
-        //{
-        //    if (deviceNumber < 0 || deviceNumber > 9)
-        //        throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
+        public static CanShow NeoPixelCanShow(this ArduinoSession session, int deviceNumber)
+        {
+            if (deviceNumber < 0 || deviceNumber > 9)
+                throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
 
-        //    var command = new[]
-        //    {
-        //        Utility.SysExStart,
-        //        NEOPIXEL_DATA,
-        //        (byte)0x01,
-        //        (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-        //        Utility.SysExEnd
-        //    };
-        //    session.Write(command, 0, command.Length);
-        //    return session.GetMessageFromQueue<StepperPosition>().Value;
-        //}
+            var command = new[]
+            {
+                Utility.SysExStart,
+                NEOPIXEL_DATA,
+                ACCELSTEPPER_MOVE_COMPLETE,
+                (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
+                Utility.SysExEnd
+            };
+            session.Write(command, 0, command.Length);
+            return session.GetMessageFromQueue<CanShow>().Value;
+        }
         //public static byte NeoPixelGetPixels(this ArduinoSession session, int deviceNumber)
         //{
         //    if (deviceNumber < 0 || deviceNumber > 9)
@@ -485,68 +497,249 @@ gamma32			KEYWORD2
         //    {
         //        Utility.SysExStart,
         //        NEOPIXEL_DATA,
-        //        (byte)0x01,
+        //        ACCELSTEPPER_MOVE_COMPLETE1,
         //        (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
         //        Utility.SysExEnd
         //    };
         //    session.Write(command, 0, command.Length);
         //    return session.GetMessageFromQueue<StepperPosition>().Value;
         //}
-        //public static byte NeoPixelGetBrightness(this ArduinoSession session, int deviceNumber)
-        //{
-        //    if (deviceNumber < 0 || deviceNumber > 9)
-        //        throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
+        public static Brightness NeoPixelGetBrightness(this ArduinoSession session, int deviceNumber)
+        {
+            if (deviceNumber < 0 || deviceNumber > 9)
+                throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
 
-        //    var command = new[]
-        //    {
-        //        Utility.SysExStart,
-        //        NEOPIXEL_DATA,
-        //        (byte)0x01,
-        //        (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-        //        Utility.SysExEnd
-        //    };
-        //    session.Write(command, 0, command.Length);
-        //            return session.GetMessageFromQueue<StepperPosition>().Value;
-        //}  
-        //public static void NeoPixelNumPixels(this ArduinoSession session, int deviceNumber)
-        //{
-        //    if (deviceNumber < 0 || deviceNumber > 9)
-        //        throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
+            var command = new[]
+            {
+                Utility.SysExStart,
+                NEOPIXEL_DATA,
+                ACCELSTEPPER_MOVE_COMPLETE2,
+                (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
+                Utility.SysExEnd
+            };
+            session.Write(command, 0, command.Length);
+            return session.GetMessageFromQueue<Brightness>().Value;
+        }
+        public static Pin NeoPixelGetPin(this ArduinoSession session, int deviceNumber)
+        {
+            if (deviceNumber < 0 || deviceNumber > 9)
+                throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
 
-        //    var command = new[]
-        //    {
-        //        Utility.SysExStart,
-        //        NEOPIXEL_DATA,
-        //        (byte)0x01,
-        //        (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-        //        Utility.SysExEnd
-        //    };
-        //    session.Write(command, 0, command.Length);
-        //}
-        //public static void NeoPixelColor(this ArduinoSession session, int deviceNumber)
-        //{
-        //    if (deviceNumber < 0 || deviceNumber > 9)
-        //        throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
+            var command = new[]
+            {
+                Utility.SysExStart,
+                NEOPIXEL_DATA,
+                ACCELSTEPPER_MOVE_COMPLETE3,
+                (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
+                Utility.SysExEnd
+            };
+            session.Write(command, 0, command.Length);
+            return session.GetMessageFromQueue<Pin>().Value;
+        }
+        /// <summary>
+        /// 貌似存在问题
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="deviceNumber"></param>
+        /// <returns></returns>
+        public static NumPixels NeoPixelNumPixels(this ArduinoSession session, int deviceNumber)
+        {
+            if (deviceNumber < 0 || deviceNumber > 9)
+                throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
 
-        //    var command = new[]
-        //    {
-        //        Utility.SysExStart,
-        //        NEOPIXEL_DATA,
-        //        (byte)0x01,
-        //        (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-        //        Utility.SysExEnd
-        //    };
-        //    session.Write(command, 0, command.Length);
-        //}
+            var command = new[]
+            {
+                Utility.SysExStart,
+                NEOPIXEL_DATA,
+                ACCELSTEPPER_MOVE_COMPLETE4,
+                (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
+                Utility.SysExEnd
+            };
+            session.Write(command, 0, command.Length);
+            return session.GetMessageFromQueue<NumPixels>().Value;
+        }
+        /// <summary>
+        /// 貌似存在问题
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="deviceNumber"></param>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public static GetPixelColor NeoPixelGetPixelColor(this ArduinoSession session, int deviceNumber, int n)
+        {
+            if (deviceNumber < 0 || deviceNumber > 9)
+                throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
 
+            var bytes = n.encode32BitSignedInteger();
+            var command = new[]
+            {
+                Utility.SysExStart,
+                NEOPIXEL_DATA,
+                ACCELSTEPPER_MOVE_COMPLETE5,
+                (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
+                bytes[0], //4  num steps, bits 0-6
+                bytes[1], //5  num steps, bits 7-13
+                bytes[2], //6  num steps, bits 14-20
+                bytes[3], //7  num steps, bits 21-27
+                bytes[4], //8  num steps, bits 28-32
+                Utility.SysExEnd
+            };
+            session.Write(command, 0, command.Length);
 
-        //  delay_ns()
-        //  setPin()
-        //  ColorHSV()
-        //  getPixelColor()
-        //  setBrightness()
-        //  getBrightness()
-        //  gamma32()
+            return session.GetMessageFromQueue<GetPixelColor>().Value;
+        }
+        public static Sine8 NeoPixelSine8(this ArduinoSession session, int deviceNumber, byte x)
+        {
+            if (deviceNumber < 0 || deviceNumber > 9)
+                throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
+
+            var command = new[]
+            {
+                Utility.SysExStart,
+                NEOPIXEL_DATA,
+                ACCELSTEPPER_MOVE_COMPLETE6,
+                (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
+                x,
+                Utility.SysExEnd
+            };
+            session.Write(command, 0, command.Length);
+
+            return session.GetMessageFromQueue<Sine8>().Value;
+        }
+        /// <summary>
+        /// 貌似存在问题
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="deviceNumber"></param>
+        /// <param name="x"></param>
+        /// <returns></returns>
+        public static Gamma8 NeoPixelGamma8(this ArduinoSession session, int deviceNumber, byte x)
+        {
+            if (deviceNumber < 0 || deviceNumber > 9)
+                throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
+
+            var command = new[]
+            {
+                Utility.SysExStart,
+                NEOPIXEL_DATA,
+                ACCELSTEPPER_MOVE_COMPLETE7,
+                (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
+                x,
+                Utility.SysExEnd
+            };
+            session.Write(command, 0, command.Length);
+
+            return session.GetMessageFromQueue<Gamma8>().Value;
+        }
+        /// <summary>
+        /// 貌似存在问题
+        /// A gamma-correction function for 32-bit packed RGB or WRGB
+        /// colors. Makes color transitions appear more perceptially
+        /// correct.
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="deviceNumber"></param>
+        /// <param name="x">32-bit packed RGB or WRGB color.</param>
+        /// <returns>
+        ///   Gamma-adjusted packed color, can then be passed in one of the
+        ///   setPixelColor() functions. Like gamma8(), this uses a fixed
+        ///   gamma correction exponent of 2.6, which seems reasonably okay
+        ///   for average NeoPixels in average tasks. If you need finer
+        ///   control you'll need to provide your own gamma-correction
+        ///   function instead.
+        /// </returns>
+        public static Gamma32 NeoPixelGamma32(this ArduinoSession session, int deviceNumber, int x)
+        {
+            if (deviceNumber < 0 || deviceNumber > 9)
+                throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
+
+            var bytes = x.encode32BitSignedInteger();
+            var command = new[]
+            {
+              Utility.SysExStart,
+              NEOPIXEL_DATA,
+              ACCELSTEPPER_MOVE_COMPLETE8,
+              (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
+              bytes[0], //4  num steps, bits 0-6
+              bytes[1], //5  num steps, bits 7-13
+              bytes[2], //6  num steps, bits 14-20
+              bytes[3], //7  num steps, bits 21-27
+              bytes[4], //8  num steps, bits 28-32
+              Utility.SysExEnd
+          };
+            session.Write(command, 0, command.Length);
+
+            return session.GetMessageFromQueue<Gamma32>().Value;
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="deviceNumber"></param>
+        /// <param name="red"></param>
+        /// <param name="green"></param>
+        /// <param name="blue"></param>
+        /// <param name="white"></param>
+        /// <returns></returns>
+        public static PixelColor NeoPixelColor(this ArduinoSession session, int deviceNumber, byte red, byte green, byte blue, byte? white = null)
+        {
+            if (deviceNumber < 0 || deviceNumber > 9)
+                throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
+
+            var command = new List<byte>
+          {
+              Utility.SysExStart,
+              NEOPIXEL_DATA,
+              ACCELSTEPPER_MOVE_COMPLETE9,
+              (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
+              (byte)red,
+              (byte)green,
+              (byte)blue,
+              //(byte)white,
+              //Utility.SysExEnd
+          };
+            if (white.HasValue)
+                command.Add((byte)white.Value);
+
+            command.Add(Utility.SysExEnd);
+
+            session.Write(command.ToArray(), 0, command.Count);
+            return session.GetMessageFromQueue<PixelColor>().Value;
+        }
+        /// <summary>
+        /// 貌似存在问题
+        /// </summary>
+        /// <param name="session"></param>
+        /// <param name="deviceNumber"></param>
+        /// <param name="hue"></param>
+        /// <param name="sat"></param>
+        /// <param name="val"></param>
+        /// <returns></returns>
+        public static ColorHSV NeoPixelColorHSV(this ArduinoSession session, int deviceNumber, int hue, byte sat, byte val)
+        {
+            if (deviceNumber < 0 || deviceNumber > 9)
+                throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
+
+            var bytes = hue.encode32BitSignedInteger();
+            var command = new[]
+            {
+              Utility.SysExStart,
+              NEOPIXEL_DATA,
+              ACCELSTEPPER_MOVE_COMPLETE8,
+              (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
+              bytes[0], //4  num steps, bits 0-6
+              bytes[1], //5  num steps, bits 7-13
+              bytes[2], //6  num steps, bits 14-20
+              bytes[3], //7  num steps, bits 21-27
+              bytes[4], //8  num steps, bits 28-32
+              sat,
+              val,
+              Utility.SysExEnd
+          };
+            session.Write(command, 0, command.Length);
+
+            return session.GetMessageFromQueue<ColorHSV>().Value;
+        }
     }
 
 
@@ -592,58 +785,58 @@ gamma32			KEYWORD2
     }
 
     /*
-     
+
      // RGB NeoPixel permutations; white and red offsets are always same
-// Offset:         W        R        G        B
-#define NEO_RGB  ((0<<6) | (0<<4) | (1<<2) | (2)) ///< Transmit as R,G,B
-#define NEO_RBG  ((0<<6) | (0<<4) | (2<<2) | (1)) ///< Transmit as R,B,G
-#define NEO_GRB  ((1<<6) | (1<<4) | (0<<2) | (2)) ///< Transmit as G,R,B
-#define NEO_GBR  ((2<<6) | (2<<4) | (0<<2) | (1)) ///< Transmit as G,B,R
-#define NEO_BRG  ((1<<6) | (1<<4) | (2<<2) | (0)) ///< Transmit as B,R,G
-#define NEO_BGR  ((2<<6) | (2<<4) | (1<<2) | (0)) ///< Transmit as B,G,R
+  // Offset:         W        R        G        B
+  #define NEO_RGB  ((0<<6) | (0<<4) | (1<<2) | (2)) ///< Transmit as R,G,B
+  #define NEO_RBG  ((0<<6) | (0<<4) | (2<<2) | (1)) ///< Transmit as R,B,G
+  #define NEO_GRB  ((1<<6) | (1<<4) | (0<<2) | (2)) ///< Transmit as G,R,B
+  #define NEO_GBR  ((2<<6) | (2<<4) | (0<<2) | (1)) ///< Transmit as G,B,R
+  #define NEO_BRG  ((1<<6) | (1<<4) | (2<<2) | (0)) ///< Transmit as B,R,G
+  #define NEO_BGR  ((2<<6) | (2<<4) | (1<<2) | (0)) ///< Transmit as B,G,R
 
-// RGBW NeoPixel permutations; all 4 offsets are distinct
-// Offset:         W          R          G          B
-#define NEO_WRGB ((0<<6) | (1<<4) | (2<<2) | (3)) ///< Transmit as W,R,G,B
-#define NEO_WRBG ((0<<6) | (1<<4) | (3<<2) | (2)) ///< Transmit as W,R,B,G
-#define NEO_WGRB ((0<<6) | (2<<4) | (1<<2) | (3)) ///< Transmit as W,G,R,B
-#define NEO_WGBR ((0<<6) | (3<<4) | (1<<2) | (2)) ///< Transmit as W,G,B,R
-#define NEO_WBRG ((0<<6) | (2<<4) | (3<<2) | (1)) ///< Transmit as W,B,R,G
-#define NEO_WBGR ((0<<6) | (3<<4) | (2<<2) | (1)) ///< Transmit as W,B,G,R
+  // RGBW NeoPixel permutations; all 4 offsets are distinct
+  // Offset:         W          R          G          B
+  #define NEO_WRGB ((0<<6) | (1<<4) | (2<<2) | (3)) ///< Transmit as W,R,G,B
+  #define NEO_WRBG ((0<<6) | (1<<4) | (3<<2) | (2)) ///< Transmit as W,R,B,G
+  #define NEO_WGRB ((0<<6) | (2<<4) | (1<<2) | (3)) ///< Transmit as W,G,R,B
+  #define NEO_WGBR ((0<<6) | (3<<4) | (1<<2) | (2)) ///< Transmit as W,G,B,R
+  #define NEO_WBRG ((0<<6) | (2<<4) | (3<<2) | (1)) ///< Transmit as W,B,R,G
+  #define NEO_WBGR ((0<<6) | (3<<4) | (2<<2) | (1)) ///< Transmit as W,B,G,R
 
-#define NEO_RWGB ((1<<6) | (0<<4) | (2<<2) | (3)) ///< Transmit as R,W,G,B
-#define NEO_RWBG ((1<<6) | (0<<4) | (3<<2) | (2)) ///< Transmit as R,W,B,G
-#define NEO_RGWB ((2<<6) | (0<<4) | (1<<2) | (3)) ///< Transmit as R,G,W,B
-#define NEO_RGBW ((3<<6) | (0<<4) | (1<<2) | (2)) ///< Transmit as R,G,B,W
-#define NEO_RBWG ((2<<6) | (0<<4) | (3<<2) | (1)) ///< Transmit as R,B,W,G
-#define NEO_RBGW ((3<<6) | (0<<4) | (2<<2) | (1)) ///< Transmit as R,B,G,W
+  #define NEO_RWGB ((1<<6) | (0<<4) | (2<<2) | (3)) ///< Transmit as R,W,G,B
+  #define NEO_RWBG ((1<<6) | (0<<4) | (3<<2) | (2)) ///< Transmit as R,W,B,G
+  #define NEO_RGWB ((2<<6) | (0<<4) | (1<<2) | (3)) ///< Transmit as R,G,W,B
+  #define NEO_RGBW ((3<<6) | (0<<4) | (1<<2) | (2)) ///< Transmit as R,G,B,W
+  #define NEO_RBWG ((2<<6) | (0<<4) | (3<<2) | (1)) ///< Transmit as R,B,W,G
+  #define NEO_RBGW ((3<<6) | (0<<4) | (2<<2) | (1)) ///< Transmit as R,B,G,W
 
-#define NEO_GWRB ((1<<6) | (2<<4) | (0<<2) | (3)) ///< Transmit as G,W,R,B
-#define NEO_GWBR ((1<<6) | (3<<4) | (0<<2) | (2)) ///< Transmit as G,W,B,R
-#define NEO_GRWB ((2<<6) | (1<<4) | (0<<2) | (3)) ///< Transmit as G,R,W,B
-#define NEO_GRBW ((3<<6) | (1<<4) | (0<<2) | (2)) ///< Transmit as G,R,B,W
-#define NEO_GBWR ((2<<6) | (3<<4) | (0<<2) | (1)) ///< Transmit as G,B,W,R
-#define NEO_GBRW ((3<<6) | (2<<4) | (0<<2) | (1)) ///< Transmit as G,B,R,W
+  #define NEO_GWRB ((1<<6) | (2<<4) | (0<<2) | (3)) ///< Transmit as G,W,R,B
+  #define NEO_GWBR ((1<<6) | (3<<4) | (0<<2) | (2)) ///< Transmit as G,W,B,R
+  #define NEO_GRWB ((2<<6) | (1<<4) | (0<<2) | (3)) ///< Transmit as G,R,W,B
+  #define NEO_GRBW ((3<<6) | (1<<4) | (0<<2) | (2)) ///< Transmit as G,R,B,W
+  #define NEO_GBWR ((2<<6) | (3<<4) | (0<<2) | (1)) ///< Transmit as G,B,W,R
+  #define NEO_GBRW ((3<<6) | (2<<4) | (0<<2) | (1)) ///< Transmit as G,B,R,W
 
-#define NEO_BWRG ((1<<6) | (2<<4) | (3<<2) | (0)) ///< Transmit as B,W,R,G
-#define NEO_BWGR ((1<<6) | (3<<4) | (2<<2) | (0)) ///< Transmit as B,W,G,R
-#define NEO_BRWG ((2<<6) | (1<<4) | (3<<2) | (0)) ///< Transmit as B,R,W,G
-#define NEO_BRGW ((3<<6) | (1<<4) | (2<<2) | (0)) ///< Transmit as B,R,G,W
-#define NEO_BGWR ((2<<6) | (3<<4) | (1<<2) | (0)) ///< Transmit as B,G,W,R
-#define NEO_BGRW ((3<<6) | (2<<4) | (1<<2) | (0)) ///< Transmit as B,G,R,W
-    
-// Add NEO_KHZ400 to the color order value to indicate a 400 KHz device.
-// All but the earliest v1 NeoPixels expect an 800 KHz data stream, this is
-// the default if unspecified. Because flash space is very limited on ATtiny
-// devices (e.g. Trinket, Gemma), v1 NeoPixels aren't handled by default on
-// those chips, though it can be enabled by removing the ifndef/endif below,
-// but code will be bigger. Conversely, can disable the NEO_KHZ400 line on
-// other MCUs to remove v1 support and save a little space.
+  #define NEO_BWRG ((1<<6) | (2<<4) | (3<<2) | (0)) ///< Transmit as B,W,R,G
+  #define NEO_BWGR ((1<<6) | (3<<4) | (2<<2) | (0)) ///< Transmit as B,W,G,R
+  #define NEO_BRWG ((2<<6) | (1<<4) | (3<<2) | (0)) ///< Transmit as B,R,W,G
+  #define NEO_BRGW ((3<<6) | (1<<4) | (2<<2) | (0)) ///< Transmit as B,R,G,W
+  #define NEO_BGWR ((2<<6) | (3<<4) | (1<<2) | (0)) ///< Transmit as B,G,W,R
+  #define NEO_BGRW ((3<<6) | (2<<4) | (1<<2) | (0)) ///< Transmit as B,G,R,W
 
-#define NEO_KHZ800 0x0000 ///< 800 KHz data transmission
-#ifndef __AVR_ATtiny85__
-#define NEO_KHZ400 0x0100 ///< 400 KHz data transmission
-#endif
-     
+  // Add NEO_KHZ400 to the color order value to indicate a 400 KHz device.
+  // All but the earliest v1 NeoPixels expect an 800 KHz data stream, this is
+  // the default if unspecified. Because flash space is very limited on ATtiny
+  // devices (e.g. Trinket, Gemma), v1 NeoPixels aren't handled by default on
+  // those chips, though it can be enabled by removing the ifndef/endif below,
+  // but code will be bigger. Conversely, can disable the NEO_KHZ400 line on
+  // other MCUs to remove v1 support and save a little space.
+
+  #define NEO_KHZ800 0x0000 ///< 800 KHz data transmission
+  #ifndef __AVR_ATtiny85__
+  #define NEO_KHZ400 0x0100 ///< 400 KHz data transmission
+  #endif
+
      */
 }
