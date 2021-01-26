@@ -4,6 +4,7 @@ using Arduino.Firmata.Protocol.I2C;
 using Arduino.Firmata.Protocol.Serial;
 using Arduino.Firmata.Protocol.String;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
@@ -15,13 +16,24 @@ namespace Arduino.Firmata.Protocol.Firmata
     /// <seealso href="http://arduino.cc/en/Reference/Serial">Serial reference for Arduino</seealso>
     public class FirmataMessageHeader //: IDisposable
     {
-        public static ISysExMessage[] sysExMessage = new ISysExMessage[] {
+        private static List<ISysExMessage> sysExMessage = new List<ISysExMessage> {
                 new SysExMessage(),
                 new I2CSysExMessage(),
                 new StringSysExMessage(),
                 new AccelStepperSysExMessage(),
                 new SerialSysExMessage()
                 };
+
+        public static void RegisterMessage(ISysExMessage sysEx)
+        {
+            if (!sysExMessage.Contains(sysEx))
+                sysExMessage.Add(sysEx);
+        }
+        public static void RegisterMessage<T>() where T : ISysExMessage
+        {
+            var obj = System.Activator.CreateInstance<T>();
+            RegisterMessage(obj);
+        }
 
         private enum MessageHeader1
         {
