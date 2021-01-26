@@ -24,13 +24,13 @@ namespace Arduino.Firmata.Protocol.NeoPixel
             var messageByte2 = (byte)messageHeader.MessageBuffer[2];
             if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_CAN_SHOW)
                 return CanShow(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_COMPLETE1)
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GET_PIXELS)
                 return GetPixels(messageHeader);
             else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GET_BRIGHTNESS)
                 return GetBrightness(messageHeader);
             else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GET_PIN)
                 return GetPin(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_COMPLETE4)
+            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_NUM_PIXELS)
                 return NumPixels(messageHeader);
             else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GET_PIXEL_COLOR)
                 return GetPixelColor(messageHeader);

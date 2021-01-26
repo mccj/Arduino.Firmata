@@ -197,10 +197,10 @@ gamma32			KEYWORD2
         public const byte NEOPIXEL_SET_BRIGHTNESS = 0x09;
 
         public const byte NEOPIXEL_REPORT_CAN_SHOW = 0x0a;
-        public const byte NEOPIXEL_REPORT_COMPLETE1 = 0x0b;
+        public const byte NEOPIXEL_REPORT_GET_PIXELS = 0x0b;
         public const byte NEOPIXEL_REPORT_GET_BRIGHTNESS = 0x0c;
         public const byte NEOPIXEL_REPORT_GET_PIN = 0x0d;
-        public const byte NEOPIXEL_REPORT_COMPLETE4 = 0x0e;
+        public const byte NEOPIXEL_REPORT_NUM_PIXELS = 0x0e;
         public const byte NEOPIXEL_REPORT_GET_PIXEL_COLOR = 0x0f;
         public const byte NEOPIXEL_REPORT_SINE8 = 0x10;
         public const byte NEOPIXEL_REPORT_GAMMA8 = 0x11;
@@ -497,7 +497,7 @@ gamma32			KEYWORD2
         //    {
         //        Utility.SysExStart,
         //        NEOPIXEL_DATA,
-        //        NEOPIXEL_REPORT_COMPLETE1,
+        //        NEOPIXEL_REPORT_GET_PIXELS,
         //        (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
         //        Utility.SysExEnd
         //    };
@@ -551,7 +551,7 @@ gamma32			KEYWORD2
             {
                 Utility.SysExStart,
                 NEOPIXEL_DATA,
-                NEOPIXEL_REPORT_COMPLETE4,
+                NEOPIXEL_REPORT_NUM_PIXELS,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
                 Utility.SysExEnd
             };
