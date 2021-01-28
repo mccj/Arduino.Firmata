@@ -1,5 +1,6 @@
 ﻿using Arduino.Firmata;
 using Arduino.Firmata.Protocol.AccelStepper;
+using Arduino.Firmata.Protocol.EEPROM;
 using Arduino.Firmata.Protocol.Firmata;
 using Arduino.Firmata.Protocol.NeoPixel;
 using Arduino.Firmata.Protocol.Serial;
@@ -18,6 +19,8 @@ namespace Solid.Arduino.Run
     {
         static void Main(string[] args)
         {
+            //var ss1 = NumberExtensions.encode8BitSignedByte(247);
+            //var ss2 = NumberExtensions.decode32BitSignedInteger(0x77,0x1,0x0,0x0,0x0);
             //var s=  NumberExtensions.decode32BitSignedInteger(0, 20, 0, 0, 0);
             //var _serial = new System.IO.Ports.SerialPort("COM9", 57600/*, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One*/);
 
@@ -66,7 +69,8 @@ namespace Solid.Arduino.Run
 
                 //AnalogPinTest(connection);
                 //DigitalPinTest(connection);
-                NeoPixelTest(connection);
+                EEPROMTest(connection);
+                //NeoPixelTest(connection);
 
                 //StepperTest(connection, session =>
                 //{
@@ -172,8 +176,8 @@ namespace Solid.Arduino.Run
         private static IDataConnection GetSerialConnection()
         {
             Console.WriteLine("正在搜索Arduino连接...");
-            //var connection = new SerialConnection("COM5", 57600);
-            var connection = new SerialConnection("COM5", 115200);
+            var connection = new SerialConnection("COM9", 57600);
+            //var connection = new SerialConnection("COM5", 115200);
 
             //EnhancedSerialConnection.Find();
 
@@ -221,6 +225,36 @@ namespace Solid.Arduino.Run
             Console.WriteLine("按任意建停止");
             Console.ReadKey();
             tcp.Stop();
+        }
+        private static void EEPROMTest(IDataConnection connection)
+        {
+            FirmataMessageHeader.RegisterMessage<EEPROMSysExMessage>();
+            var session = new ArduinoSession(connection, timeOut: 5000);
+
+            session.CreateReceivedStringMonitor().Monitor(f =>
+            {
+                Console.WriteLine($"字符串输出 {f}");
+            });
+
+            session.ResetBoard();
+            var firmware = session.GetFirmware();//获取固件信息
+            var protocolVersion = session.GetProtocolVersion();//获取协议信息
+
+            var s1 = session.EEPROM_Length();
+            session.EEPROM_Write(8, 247);
+            var s2 = session.EEPROM_Read(8);
+            session.EEPROM_Update(8, 222);
+            var s3 = session.EEPROM_Read(8);
+            var bytes = new byte[/*s1-512*/]
+                {
+                0,62,63,127,191,255
+                };
+            //for (int i = 0; i < bytes.Length; i++)
+            //{
+            //    bytes[i] = (byte)(i % 255);
+            //}
+            session.EEPROM_Put(2, bytes);
+            var s4 = session.EEPROM_Get(2,/* bytes.Length*/20);
         }
         private static void NeoPixelTest(IDataConnection connection)
         {

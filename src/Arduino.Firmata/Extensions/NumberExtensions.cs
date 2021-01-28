@@ -8,6 +8,20 @@ namespace Arduino.Firmata
     /// </summary>
     public static class NumberExtensions
     {
+        public static byte decode8BitSignedByte(byte arg1, byte arg2)
+        {
+            var result = arg1 | (arg2 << 7);
+            //var result = decode32BitSignedInteger(arg1, arg2, 0, 0, 0);
+            return (byte)result;
+        }
+        public static byte[] encode8BitSignedByte(this byte value)
+        {
+            var pdata = new[] {
+                (byte) (value & 0x7f),
+                (byte) ((value >> 7) & 0x7f)
+            };
+            return pdata;
+        }
         public static long decode32BitSignedInteger(byte arg1, byte arg2, byte arg3, byte arg4, byte arg5)
         {
             long result = (long)arg1 | (long)arg2 << 7 | (long)arg3 << 14 | (long)arg4 << 21 | (((long)arg5 << 28) & 0x07);
@@ -108,6 +122,5 @@ namespace Arduino.Firmata
             if (newNum > maxNum) newNum = maxNum;
             return System.Tuple.Create((int)newNum, result);
         }
-
     }
 }
