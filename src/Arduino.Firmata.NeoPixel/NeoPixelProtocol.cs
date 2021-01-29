@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Arduino.Firmata.Protocol.NeoPixel
 {
@@ -208,7 +209,15 @@ gamma32			KEYWORD2
         public const byte NEOPIXEL_REPORT_COLOR = 0x13;
         public const byte NEOPIXEL_REPORT_COLORHSV = 0x14;
 
-        public static void NeoPixelConfiguration(this ArduinoSession session, int deviceNumber)
+        private static FirmataMessage<GenericResponse> getMessageFromQueue(ArduinoSession session, byte messageType, byte messageSubType, int deviceNumber)
+        {
+            return session.GetMessageFromQueue<GenericResponse>(message => message.Value.MessageType == messageType && message.Value.MessageSubType == messageSubType && message.Value.DeviceNumber == deviceNumber);
+        }
+        private static FirmataMessage<GenericResponse<T>> getMessageFromQueue<T>(ArduinoSession session, byte messageType, byte messageSubType, int deviceNumber)
+        {
+            return session.GetMessageFromQueue<GenericResponse<T>>(message => message.Value.MessageType == messageType && message.Value.MessageSubType == messageSubType && message.Value.DeviceNumber == deviceNumber);
+        }
+        private static void requestNeoPixelConfiguration(this ArduinoSession session, int deviceNumber)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -224,7 +233,17 @@ gamma32			KEYWORD2
 
             session.Write(command, 0, command.Length);
         }
-        public static void NeoPixelConfiguration(this ArduinoSession session, int deviceNumber, int ledCount, int pinNumber = 6, NeoPixelType ledType = NeoPixelType.NEO_GRB | NeoPixelType.NEO_KHZ800)
+        public static void NeoPixelConfiguration(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelConfiguration(session, deviceNumber);
+            getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_CONFIG, deviceNumber);
+        }
+        public static async Task NeoPixelConfigurationAsync(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelConfiguration(session, deviceNumber);
+            await Task.Run(() => getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_CONFIG, deviceNumber)).ConfigureAwait(false);
+        }
+        private static void requestNeoPixelConfiguration(this ArduinoSession session, int deviceNumber, int ledCount, int pinNumber = 6, NeoPixelType ledType = NeoPixelType.NEO_GRB | NeoPixelType.NEO_KHZ800)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -233,27 +252,41 @@ gamma32			KEYWORD2
             if (ledCount < 0)
                 throw new ArgumentOutOfRangeException(nameof(ledCount), "ledCount must be between 0.");
 
-            var bytes = ledCount.encode32BitSignedInteger();
+            var ledCountBytes = ledCount.encode32BitSignedInteger();
+            var ledTypeBytes = ((int)ledType).encode32BitSignedInteger();
             var command = new[]
             {
                 Utility.SysExStart,
                 NEOPIXEL_DATA,
                 NEOPIXEL_CONFIG,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-                bytes[0], //4  num steps, bits 0-6
-                bytes[1], //5  num steps, bits 7-13
-                bytes[2], //6  num steps, bits 14-20
-                bytes[3], //7  num steps, bits 21-27
-                bytes[4], //8  num steps, bits 28-32
+                ledCountBytes[0],
+                ledCountBytes[1],
+                ledCountBytes[2],
+                ledCountBytes[3],
+                ledCountBytes[4],
                 (byte)pinNumber,
-                (byte)ledType,
+                ledTypeBytes[0],
+                ledTypeBytes[1],
+                ledTypeBytes[2],
+                ledTypeBytes[3],
+                ledTypeBytes[4],
                 Utility.SysExEnd
             };
 
             session.Write(command, 0, command.Length);
         }
-
-        public static void NeoPixelBegin(this ArduinoSession session, int deviceNumber)
+        public static void NeoPixelConfiguration(this ArduinoSession session, int deviceNumber, int ledCount, int pinNumber = 6, NeoPixelType ledType = NeoPixelType.NEO_GRB | NeoPixelType.NEO_KHZ800)
+        {
+            requestNeoPixelConfiguration(session, deviceNumber, ledCount, pinNumber, ledType);
+            getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_CONFIG, deviceNumber);
+        }
+        public static async Task NeoPixelConfigurationAsync(this ArduinoSession session, int deviceNumber, int ledCount, int pinNumber = 6, NeoPixelType ledType = NeoPixelType.NEO_GRB | NeoPixelType.NEO_KHZ800)
+        {
+            requestNeoPixelConfiguration(session, deviceNumber, ledCount, pinNumber, ledType);
+            await Task.Run(() => getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_CONFIG, deviceNumber)).ConfigureAwait(false);
+        }
+        private static void requestNeoPixelBegin(this ArduinoSession session, int deviceNumber)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -268,7 +301,17 @@ gamma32			KEYWORD2
             };
             session.Write(command, 0, command.Length);
         }
-        public static void NeoPixelShow(this ArduinoSession session, int deviceNumber)
+        public static void NeoPixelBegin(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelBegin(session, deviceNumber);
+            getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_BEGIN, deviceNumber);
+        }
+        public static async Task NeoPixelBeginAsync(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelBegin(session, deviceNumber);
+            await Task.Run(() => getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_BEGIN, deviceNumber)).ConfigureAwait(false);
+        }
+        private static void requestNeoPixelShow(this ArduinoSession session, int deviceNumber)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -283,7 +326,17 @@ gamma32			KEYWORD2
             };
             session.Write(command, 0, command.Length);
         }
-        public static void NeoPixelClear(this ArduinoSession session, int deviceNumber)
+        public static void NeoPixelShow(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelShow(session, deviceNumber);
+            getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_SHOW, deviceNumber);
+        }
+        public static async Task NeoPixelShowAsync(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelShow(session, deviceNumber);
+            await Task.Run(() => getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_SHOW, deviceNumber)).ConfigureAwait(false);
+        }
+        private static void requestNeoPixelClear(this ArduinoSession session, int deviceNumber)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -298,7 +351,17 @@ gamma32			KEYWORD2
             };
             session.Write(command, 0, command.Length);
         }
-        public static void NeoPixelUpdateLength(this ArduinoSession session, int deviceNumber, int ledCount)
+        public static void NeoPixelClear(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelClear(session, deviceNumber);
+            getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_CLEAR, deviceNumber);
+        }
+        public static async Task NeoPixelClearAsync(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelClear(session, deviceNumber);
+            await Task.Run(() => getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_CLEAR, deviceNumber)).ConfigureAwait(false);
+        }
+        private static void requestNeoPixelUpdateLength(this ArduinoSession session, int deviceNumber, int ledCount)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -312,19 +375,31 @@ gamma32			KEYWORD2
                 NEOPIXEL_DATA,
                 NEOPIXEL_UPDATE_LENGTH,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-                bytes[0], //4  num steps, bits 0-6
-                bytes[1], //5  num steps, bits 7-13
-                bytes[2], //6  num steps, bits 14-20
-                bytes[3], //7  num steps, bits 21-27
-                bytes[4], //8  num steps, bits 28-32
+                bytes[0],
+                bytes[1],
+                bytes[2],
+                bytes[3],
+                bytes[4],
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
         }
-        public static void NeoPixelUpdateType(this ArduinoSession session, int deviceNumber, NeoPixelType ledType)
+        public static void NeoPixelUpdateLength(this ArduinoSession session, int deviceNumber, int ledCount)
+        {
+            requestNeoPixelUpdateLength(session, deviceNumber, ledCount);
+            getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_UPDATE_LENGTH, deviceNumber);
+        }
+        public static async Task NeoPixelUpdateLengthAsync(this ArduinoSession session, int deviceNumber, int ledCount)
+        {
+            requestNeoPixelUpdateLength(session, deviceNumber, ledCount);
+            await Task.Run(() => getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_UPDATE_LENGTH, deviceNumber)).ConfigureAwait(false);
+        }
+        private static void requestNeoPixelUpdateType(this ArduinoSession session, int deviceNumber, NeoPixelType ledType)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
+
+            var ledTypeBytes = ((int)ledType).encode32BitSignedInteger();
 
             var command = new[]
             {
@@ -332,12 +407,26 @@ gamma32			KEYWORD2
                 NEOPIXEL_DATA,
                 NEOPIXEL_UPDATE_TYPE,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-                (byte)ledType,
+                ledTypeBytes[0],
+                ledTypeBytes[1],
+                ledTypeBytes[2],
+                ledTypeBytes[3],
+                ledTypeBytes[4],
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
         }
-        public static void NeoPixelSetPin(this ArduinoSession session, int deviceNumber, int pinNumber)
+        public static void NeoPixelUpdateType(this ArduinoSession session, int deviceNumber, NeoPixelType ledType = NeoPixelType.NEO_GRB | NeoPixelType.NEO_KHZ800)
+        {
+            requestNeoPixelUpdateType(session, deviceNumber, ledType);
+            getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_UPDATE_TYPE, deviceNumber);
+        }
+        public static async Task NeoPixelUpdateTypeAsync(this ArduinoSession session, int deviceNumber, NeoPixelType ledType = NeoPixelType.NEO_GRB | NeoPixelType.NEO_KHZ800)
+        {
+            requestNeoPixelUpdateType(session, deviceNumber, ledType);
+            await Task.Run(() => getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_UPDATE_TYPE, deviceNumber)).ConfigureAwait(false);
+        }
+        private static void requestNeoPixelSetPin(this ArduinoSession session, int deviceNumber, int pinNumber)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -355,46 +444,72 @@ gamma32			KEYWORD2
             };
             session.Write(command, 0, command.Length);
         }
-        public static void NeoPixelSetPixelColor(this ArduinoSession session, int deviceNumber, int n, byte red, byte green, byte blue, byte? white = null)
+        public static void NeoPixelSetPin(this ArduinoSession session, int deviceNumber, int pinNumber = 6)
+        {
+            requestNeoPixelSetPin(session, deviceNumber, pinNumber);
+            getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_SET_PIN, deviceNumber);
+        }
+        public static async Task NeoPixelSetPinAsync(this ArduinoSession session, int deviceNumber, int pinNumber = 6)
+        {
+            requestNeoPixelSetPin(session, deviceNumber, pinNumber);
+            await Task.Run(() => getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_SET_PIN, deviceNumber)).ConfigureAwait(false);
+        }
+        private static void requestNeoPixelSetPixelColor(this ArduinoSession session, int deviceNumber, int n, byte red, byte green, byte blue, byte? white = null)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
 
-            var bytes = n.encode32BitSignedInteger();
+            var nBytes = n.encode32BitSignedInteger();
+            var redBytes = red.encode8BitSignedByte();
+            var greenBytes = green.encode8BitSignedByte();
+            var blueBytes = blue.encode8BitSignedByte();
             var command = new List<byte>
             {
                 Utility.SysExStart,
                 NEOPIXEL_DATA,
                 NEOPIXEL_SET_PIXEL_COLOR,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-                bytes[0], //4  num steps, bits 0-6
-                bytes[1], //5  num steps, bits 7-13
-                bytes[2], //6  num steps, bits 14-20
-                bytes[3], //7  num steps, bits 21-27
-                bytes[4], //8  num steps, bits 28-32
-                (byte)red,
-                (byte)green,
-                (byte)blue,
+                nBytes[0],
+                nBytes[1],
+                nBytes[2],
+                nBytes[3],
+                nBytes[4],
+                redBytes[0],
+                redBytes[1],
+                greenBytes[0],
+                greenBytes[1],
+                blueBytes[0],
+                blueBytes[1],
                 //(byte)white,
                 //Utility.SysExEnd
             };
             if (white.HasValue)
-                command.Add((byte)white.Value);
+            {
+                var whiteBytes = white.Value.encode8BitSignedByte();
+                command.AddRange(whiteBytes);
+            }
+
 
             command.Add(Utility.SysExEnd);
 
             session.Write(command.ToArray(), 0, command.Count);
         }
-        public static void NeoPixelSetPixelColor(this ArduinoSession session, int deviceNumber, int n, System.Drawing.Color color)
+        public static void NeoPixelSetPixelColor(this ArduinoSession session, int deviceNumber, int n, byte red, byte green, byte blue, byte? white = null)
         {
-            NeoPixelSetPixelColor(session, deviceNumber, n, color.ToArgb());
+            requestNeoPixelSetPixelColor(session, deviceNumber, n, red, green, blue, white);
+            getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_SET_PIXEL_COLOR, deviceNumber);
         }
-        public static void NeoPixelSetPixelColor(this ArduinoSession session, int deviceNumber, int n, int color)
+        public static async Task NeoPixelSetPixelColorAsync(this ArduinoSession session, int deviceNumber, int n, byte red, byte green, byte blue, byte? white = null)
+        {
+            requestNeoPixelSetPixelColor(session, deviceNumber, n, red, green, blue, white);
+            await Task.Run(() => getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_SET_PIXEL_COLOR, deviceNumber)).ConfigureAwait(false);
+        }
+        private static void requestNeoPixelSetPixelColor(this ArduinoSession session, int deviceNumber, int n, int color)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
 
-            var bytes = n.encode32BitSignedInteger();
+            var nbytes = n.encode32BitSignedInteger();
             var colorBytes = color.encode32BitSignedInteger();
             var command = new[]
             {
@@ -402,27 +517,41 @@ gamma32			KEYWORD2
                 NEOPIXEL_DATA,
                 NEOPIXEL_SET_PIXEL_COLOR,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-                bytes[0], //4  num steps, bits 0-6
-                bytes[1], //5  num steps, bits 7-13
-                bytes[2], //6  num steps, bits 14-20
-                bytes[3], //7  num steps, bits 21-27
-                bytes[4], //8  num steps, bits 28-32
-                colorBytes[0], //4  num steps, bits 0-6
-                colorBytes[1], //5  num steps, bits 7-13
-                colorBytes[2], //6  num steps, bits 14-20
-                colorBytes[3], //7  num steps, bits 21-27
-                colorBytes[4], //8  num steps, bits 28-32
+                nbytes[0],
+                nbytes[1],
+                nbytes[2],
+                nbytes[3],
+                nbytes[4],
+                colorBytes[0],
+                colorBytes[1],
+                colorBytes[2],
+                colorBytes[3],
+                colorBytes[4],
                 Utility.SysExEnd
             };
 
 
             session.Write(command, 0, command.Length);
         }
-        public static void NeoPixelFill(this ArduinoSession session, int deviceNumber, System.Drawing.Color color, int first, int count)
+        public static void NeoPixelSetPixelColor(this ArduinoSession session, int deviceNumber, int n, int color)
         {
-            NeoPixelFill(session, deviceNumber, color.ToArgb(), first, count);
+            requestNeoPixelSetPixelColor(session, deviceNumber, n, color);
+            getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_SET_PIXEL_COLOR, deviceNumber);
         }
-        public static void NeoPixelFill(this ArduinoSession session, int deviceNumber, int color, int first, int count)
+        public static async Task NeoPixelSetPixelColorAsync(this ArduinoSession session, int deviceNumber, int n, int color)
+        {
+            requestNeoPixelSetPixelColor(session, deviceNumber, n, color);
+            await Task.Run(() => getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_SET_PIXEL_COLOR, deviceNumber)).ConfigureAwait(false);
+        }
+        public static void NeoPixelSetPixelColor(this ArduinoSession session, int deviceNumber, int n, System.Drawing.Color color)
+        {
+            NeoPixelSetPixelColor(session, deviceNumber, n, color.ToArgb());
+        }
+        public static async Task NeoPixelSetPixelColorAsync(this ArduinoSession session, int deviceNumber, int n, System.Drawing.Color color)
+        {
+            await NeoPixelSetPixelColorAsync(session, deviceNumber, n, color.ToArgb());
+        }
+        private static void requestNeoPixelFill(this ArduinoSession session, int deviceNumber, int color, int first, int count)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -436,43 +565,74 @@ gamma32			KEYWORD2
                 NEOPIXEL_DATA,
                 NEOPIXEL_FILL,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-                colorBytes[0], //4  num steps, bits 0-6
-                colorBytes[1], //5  num steps, bits 7-13
-                colorBytes[2], //6  num steps, bits 14-20
-                colorBytes[3], //7  num steps, bits 21-27
-                colorBytes[4], //8  num steps, bits 28-32
-                firstBytes[0], //4  num steps, bits 0-6
-                firstBytes[1], //5  num steps, bits 7-13
-                firstBytes[2], //6  num steps, bits 14-20
-                firstBytes[3], //7  num steps, bits 21-27
-                firstBytes[4], //8  num steps, bits 28-32
-                countBytes[0], //4  num steps, bits 0-6
-                countBytes[1], //5  num steps, bits 7-13
-                countBytes[2], //6  num steps, bits 14-20
-                countBytes[3], //7  num steps, bits 21-27
-                countBytes[4], //8  num steps, bits 28-32
+                colorBytes[0],
+                colorBytes[1],
+                colorBytes[2],
+                colorBytes[3],
+                colorBytes[4],
+                firstBytes[0],
+                firstBytes[1],
+                firstBytes[2],
+                firstBytes[3],
+                firstBytes[4],
+                countBytes[0],
+                countBytes[1],
+                countBytes[2],
+                countBytes[3],
+                countBytes[4],
 
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
         }
-        public static void NeoPixelSetBrightness(this ArduinoSession session, int deviceNumber, byte b)
+        public static void NeoPixelFill(this ArduinoSession session, int deviceNumber, int color, int first, int count)
+        {
+            requestNeoPixelFill(session, deviceNumber, color, first, count);
+            getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_FILL, deviceNumber);
+        }
+        public static async Task NeoPixelFillAsync(this ArduinoSession session, int deviceNumber, int color, int first, int count)
+        {
+            requestNeoPixelFill(session, deviceNumber, color, first, count);
+            await Task.Run(() => getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_FILL, deviceNumber)).ConfigureAwait(false);
+        }
+        public static void NeoPixelFill(this ArduinoSession session, int deviceNumber, System.Drawing.Color color, int first, int count)
+        {
+            NeoPixelFill(session, deviceNumber, color.ToArgb(), first, count);
+        }
+        public static async Task NeoPixelFillAsync(this ArduinoSession session, int deviceNumber, System.Drawing.Color color, int first, int count)
+        {
+            await NeoPixelFillAsync(session, deviceNumber, color.ToArgb(), first, count);
+        }
+        private static void requestNeoPixelSetBrightness(this ArduinoSession session, int deviceNumber, byte b)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
 
+            var nBytes = b.encode8BitSignedByte();
             var command = new[]
             {
                 Utility.SysExStart,
                 NEOPIXEL_DATA,
                 NEOPIXEL_SET_BRIGHTNESS,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-                b,
+                nBytes[0],
+                nBytes[1],
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
         }
-        public static CanShow NeoPixelCanShow(this ArduinoSession session, int deviceNumber)
+        public static void NeoPixelSetBrightness(this ArduinoSession session, int deviceNumber, byte b)
+        {
+            requestNeoPixelSetBrightness(session, deviceNumber, b);
+            getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_SET_BRIGHTNESS, deviceNumber);
+        }
+        public static async Task NeoPixelSetBrightnessAsync(this ArduinoSession session, int deviceNumber, byte b)
+        {
+            requestNeoPixelSetBrightness(session, deviceNumber, b);
+            await Task.Run(() => getMessageFromQueue(session, NEOPIXEL_DATA, NEOPIXEL_SET_BRIGHTNESS, deviceNumber)).ConfigureAwait(false);
+        }
+
+        private static void requestNeoPixelCanShow(this ArduinoSession session, int deviceNumber)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -486,8 +646,19 @@ gamma32			KEYWORD2
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
-            return session.GetMessageFromQueue<CanShow>().Value;
         }
+        public static bool NeoPixelCanShow(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelCanShow(session, deviceNumber);
+            return getMessageFromQueue<bool>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_CAN_SHOW, deviceNumber).Value.Value;
+        }
+        public static async Task<bool> NeoPixelCanShowAsync(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelCanShow(session, deviceNumber);
+            return await Task.Run(() => getMessageFromQueue<bool>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_CAN_SHOW, deviceNumber).Value.Value).ConfigureAwait(false);
+        }
+
+
         //public static byte NeoPixelGetPixels(this ArduinoSession session, int deviceNumber)
         //{
         //    if (deviceNumber < 0 || deviceNumber > 9)
@@ -504,7 +675,7 @@ gamma32			KEYWORD2
         //    session.Write(command, 0, command.Length);
         //    return session.GetMessageFromQueue<StepperPosition>().Value;
         //}
-        public static Brightness NeoPixelGetBrightness(this ArduinoSession session, int deviceNumber)
+        private static void requestNeoPixelGetBrightness(this ArduinoSession session, int deviceNumber)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -518,9 +689,18 @@ gamma32			KEYWORD2
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
-            return session.GetMessageFromQueue<Brightness>().Value;
         }
-        public static Pin NeoPixelGetPin(this ArduinoSession session, int deviceNumber)
+        public static byte NeoPixelGetBrightness(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelGetBrightness(session, deviceNumber);
+            return getMessageFromQueue<byte>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_GET_BRIGHTNESS, deviceNumber).Value.Value;
+        }
+        public static async Task<byte> NeoPixelGetBrightnessAsync(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelGetBrightness(session, deviceNumber);
+            return await Task.Run(() => getMessageFromQueue<byte>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_GET_BRIGHTNESS, deviceNumber).Value.Value).ConfigureAwait(false);
+        }
+        private static void requestNeoPixelGetPin(this ArduinoSession session, int deviceNumber)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -534,15 +714,18 @@ gamma32			KEYWORD2
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
-            return session.GetMessageFromQueue<Pin>().Value;
         }
-        /// <summary>
-        /// 貌似存在问题
-        /// </summary>
-        /// <param name="session"></param>
-        /// <param name="deviceNumber"></param>
-        /// <returns></returns>
-        public static NumPixels NeoPixelNumPixels(this ArduinoSession session, int deviceNumber)
+        public static byte NeoPixelGetPin(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelGetPin(session, deviceNumber);
+            return getMessageFromQueue<byte>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_GET_PIN, deviceNumber).Value.Value;
+        }
+        public static async Task<byte> NeoPixelGetPinAsync(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelGetPin(session, deviceNumber);
+            return await Task.Run(() => getMessageFromQueue<byte>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_GET_PIN, deviceNumber).Value.Value).ConfigureAwait(false);
+        }
+        private static void requestNeoPixelNumPixels(this ArduinoSession session, int deviceNumber)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -556,16 +739,18 @@ gamma32			KEYWORD2
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
-            return session.GetMessageFromQueue<NumPixels>().Value;
         }
-        /// <summary>
-        /// 貌似存在问题
-        /// </summary>
-        /// <param name="session"></param>
-        /// <param name="deviceNumber"></param>
-        /// <param name="n"></param>
-        /// <returns></returns>
-        public static GetPixelColor NeoPixelGetPixelColor(this ArduinoSession session, int deviceNumber, int n)
+        public static int NeoPixelNumPixels(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelNumPixels(session, deviceNumber);
+            return getMessageFromQueue<int>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_NUM_PIXELS, deviceNumber).Value.Value;
+        }
+        public static async Task<int> NeoPixelNumPixelsAsync(this ArduinoSession session, int deviceNumber)
+        {
+            requestNeoPixelNumPixels(session, deviceNumber);
+            return await Task.Run(() => getMessageFromQueue<int>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_NUM_PIXELS, deviceNumber).Value.Value).ConfigureAwait(false);
+        }
+        private static void requestNeoPixelGetPixelColor(this ArduinoSession session, int deviceNumber, int n)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -577,62 +762,93 @@ gamma32			KEYWORD2
                 NEOPIXEL_DATA,
                 NEOPIXEL_REPORT_GET_PIXEL_COLOR,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-                bytes[0], //4  num steps, bits 0-6
-                bytes[1], //5  num steps, bits 7-13
-                bytes[2], //6  num steps, bits 14-20
-                bytes[3], //7  num steps, bits 21-27
-                bytes[4], //8  num steps, bits 28-32
+                bytes[0],
+                bytes[1],
+                bytes[2],
+                bytes[3],
+                bytes[4],
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
-
-            return session.GetMessageFromQueue<GetPixelColor>().Value;
         }
-        public static Sine8 NeoPixelSine8(this ArduinoSession session, int deviceNumber, byte x)
+        public static int NeoPixelGetPixelColor(this ArduinoSession session, int deviceNumber, int n)
+        {
+            requestNeoPixelGetPixelColor(session, deviceNumber, n);
+            return getMessageFromQueue<int>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_GET_PIXEL_COLOR, deviceNumber).Value.Value;
+        }
+        public static async Task<int> NeoPixelGetPixelColorAsync(this ArduinoSession session, int deviceNumber, int n)
+        {
+            requestNeoPixelGetPixelColor(session, deviceNumber, n);
+            return await Task.Run(() => getMessageFromQueue<int>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_GET_PIXEL_COLOR, deviceNumber).Value.Value).ConfigureAwait(false);
+        }
+
+
+
+
+
+
+
+
+
+
+        private static void requestNeoPixelSine8(this ArduinoSession session, int deviceNumber, byte x)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
 
+            var xBytes = x.encode8BitSignedByte();
             var command = new[]
             {
                 Utility.SysExStart,
                 NEOPIXEL_DATA,
                 NEOPIXEL_REPORT_SINE8,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-                x,
+                xBytes[0],
+                xBytes[1],
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
-
-            return session.GetMessageFromQueue<Sine8>().Value;
         }
-        /// <summary>
-        /// 貌似存在问题
-        /// </summary>
-        /// <param name="session"></param>
-        /// <param name="deviceNumber"></param>
-        /// <param name="x"></param>
-        /// <returns></returns>
-        public static Gamma8 NeoPixelGamma8(this ArduinoSession session, int deviceNumber, byte x)
+        public static byte NeoPixelSine8(this ArduinoSession session, int deviceNumber, byte x)
+        {
+            requestNeoPixelSine8(session, deviceNumber, x);
+            return getMessageFromQueue<byte>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_SINE8, deviceNumber).Value.Value;
+        }
+        public static async Task<byte> NeoPixelSine8Async(this ArduinoSession session, int deviceNumber, byte x)
+        {
+            requestNeoPixelSine8(session, deviceNumber, x);
+            return await Task.Run(() => getMessageFromQueue<byte>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_SINE8, deviceNumber).Value.Value).ConfigureAwait(false);
+        }
+        private static void requestNeoPixelGamma8(this ArduinoSession session, int deviceNumber, byte x)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
 
+            var xBytes = x.encode8BitSignedByte();
             var command = new[]
             {
                 Utility.SysExStart,
                 NEOPIXEL_DATA,
                 NEOPIXEL_REPORT_GAMMA8,
                 (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-                x,
+                xBytes[0],
+                xBytes[1],
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
-
-            return session.GetMessageFromQueue<Gamma8>().Value;
         }
+        public static byte NeoPixelGamma8(this ArduinoSession session, int deviceNumber, byte x)
+        {
+            requestNeoPixelGamma8(session, deviceNumber, x);
+            return getMessageFromQueue<byte>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_GAMMA8, deviceNumber).Value.Value;
+        }
+        public static async Task<byte> NeoPixelGamma8Async(this ArduinoSession session, int deviceNumber, byte x)
+        {
+            requestNeoPixelGamma8(session, deviceNumber, x);
+            return await Task.Run(() => getMessageFromQueue<byte>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_GAMMA8, deviceNumber).Value.Value).ConfigureAwait(false);
+        }
+
         /// <summary>
-        /// 貌似存在问题
         /// A gamma-correction function for 32-bit packed RGB or WRGB
         /// colors. Makes color transitions appear more perceptially
         /// correct.
@@ -648,7 +864,7 @@ gamma32			KEYWORD2
         ///   control you'll need to provide your own gamma-correction
         ///   function instead.
         /// </returns>
-        public static Gamma32 NeoPixelGamma32(this ArduinoSession session, int deviceNumber, int x)
+        private static void requestNeoPixelGamma32(this ArduinoSession session, int deviceNumber, int x)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
@@ -660,88 +876,107 @@ gamma32			KEYWORD2
               NEOPIXEL_DATA,
               NEOPIXEL_REPORT_GAMMA32,
               (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-              bytes[0], //4  num steps, bits 0-6
-              bytes[1], //5  num steps, bits 7-13
-              bytes[2], //6  num steps, bits 14-20
-              bytes[3], //7  num steps, bits 21-27
-              bytes[4], //8  num steps, bits 28-32
+              bytes[0],
+              bytes[1],
+              bytes[2],
+              bytes[3],
+              bytes[4],
               Utility.SysExEnd
           };
             session.Write(command, 0, command.Length);
-
-            return session.GetMessageFromQueue<Gamma32>().Value;
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="session"></param>
-        /// <param name="deviceNumber"></param>
-        /// <param name="red"></param>
-        /// <param name="green"></param>
-        /// <param name="blue"></param>
-        /// <param name="white"></param>
-        /// <returns></returns>
-        public static PixelColor NeoPixelColor(this ArduinoSession session, int deviceNumber, byte red, byte green, byte blue, byte? white = null)
+        public static int NeoPixelGamma32(this ArduinoSession session, int deviceNumber, int x)
+        {
+            requestNeoPixelGamma32(session, deviceNumber, x);
+            return getMessageFromQueue<int>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_GAMMA32, deviceNumber).Value.Value;
+        }
+        public static async Task<int> NeoPixelGamma32Async(this ArduinoSession session, int deviceNumber, int x)
+        {
+            requestNeoPixelGamma32(session, deviceNumber, x);
+            return await Task.Run(() => getMessageFromQueue<int>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_GAMMA32, deviceNumber).Value.Value).ConfigureAwait(false);
+        }
+
+        private static void requestNeoPixelColor(this ArduinoSession session, int deviceNumber, byte red, byte green, byte blue, byte? white = null)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
 
+            var redBytes = red.encode8BitSignedByte();
+            var greenBytes = green.encode8BitSignedByte();
+            var blueBytes = blue.encode8BitSignedByte();
             var command = new List<byte>
-          {
-              Utility.SysExStart,
-              NEOPIXEL_DATA,
-              NEOPIXEL_REPORT_COLOR,
-              (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-              (byte)red,
-              (byte)green,
-              (byte)blue,
-              //(byte)white,
-              //Utility.SysExEnd
-          };
+            {
+                Utility.SysExStart,
+                NEOPIXEL_DATA,
+                NEOPIXEL_REPORT_COLOR,
+                (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
+                redBytes[0],
+                redBytes[1],
+                greenBytes[0],
+                greenBytes[1],
+                blueBytes[0],
+                blueBytes[1]
+                //Utility.SysExEnd
+            };
             if (white.HasValue)
-                command.Add((byte)white.Value);
+            {
+                var whiteBytes = white.Value.encode8BitSignedByte();
+                command.AddRange(whiteBytes);
+            }
 
             command.Add(Utility.SysExEnd);
 
             session.Write(command.ToArray(), 0, command.Count);
-            return session.GetMessageFromQueue<PixelColor>().Value;
         }
-        /// <summary>
-        /// 貌似存在问题
-        /// </summary>
-        /// <param name="session"></param>
-        /// <param name="deviceNumber"></param>
-        /// <param name="hue"></param>
-        /// <param name="sat"></param>
-        /// <param name="val"></param>
-        /// <returns></returns>
-        public static ColorHSV NeoPixelColorHSV(this ArduinoSession session, int deviceNumber, int hue, byte sat, byte val)
+        public static int NeoPixelColor(this ArduinoSession session, int deviceNumber, byte red, byte green, byte blue, byte? white = null)
+        {
+            requestNeoPixelColor(session, deviceNumber, red, green, blue, white);
+            return getMessageFromQueue<int>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_COLOR, deviceNumber).Value.Value;
+        }
+        public static async Task<int> NeoPixelColorAsync(this ArduinoSession session, int deviceNumber, byte red, byte green, byte blue, byte? white = null)
+        {
+            requestNeoPixelColor(session, deviceNumber, red, green, blue, white);
+            return await Task.Run(() => getMessageFromQueue<int>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_COLOR, deviceNumber).Value.Value).ConfigureAwait(false);
+        }
+
+        private static void requestNeoPixelColorHSV(this ArduinoSession session, int deviceNumber, int hue, byte sat, byte val)
         {
             if (deviceNumber < 0 || deviceNumber > 9)
                 throw new ArgumentOutOfRangeException(nameof(deviceNumber), "Device number must be between 0 and 9.");
 
-            var bytes = hue.encode32BitSignedInteger();
+            var hueBytes = hue.encode32BitSignedInteger();
+            var satBytes = sat.encode8BitSignedByte();
+            var valBytes = val.encode8BitSignedByte();
             var command = new[]
             {
               Utility.SysExStart,
               NEOPIXEL_DATA,
               NEOPIXEL_REPORT_COLORHSV,
               (byte)deviceNumber,//device number(0-9) (Supports up to 10 motors)
-              bytes[0], //4  num steps, bits 0-6
-              bytes[1], //5  num steps, bits 7-13
-              bytes[2], //6  num steps, bits 14-20
-              bytes[3], //7  num steps, bits 21-27
-              bytes[4], //8  num steps, bits 28-32
-              sat,
-              val,
+              hueBytes[0],
+              hueBytes[1],
+              hueBytes[2],
+              hueBytes[3],
+              hueBytes[4],
+              satBytes[0],
+              satBytes[1],
+              valBytes[0],
+              valBytes[1],
               Utility.SysExEnd
           };
             session.Write(command, 0, command.Length);
-
-            return session.GetMessageFromQueue<ColorHSV>().Value;
+        }
+        public static int PixelColorHSV(this ArduinoSession session, int deviceNumber, int hue, byte sat, byte val)
+        {
+            requestNeoPixelColorHSV(session, deviceNumber, hue, sat, val);
+            return getMessageFromQueue<int>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_COLORHSV, deviceNumber).Value.Value;
+        }
+        public static async Task<int> PixelColorHSVAsync(this ArduinoSession session, int deviceNumber, int hue, byte sat, byte val)
+        {
+            requestNeoPixelColorHSV(session, deviceNumber, hue, sat, val);
+            return await Task.Run(() => getMessageFromQueue<int>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_COLORHSV, deviceNumber).Value.Value).ConfigureAwait(false);
         }
     }
-
 
     public enum NeoPixelType : uint
     {

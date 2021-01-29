@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Arduino.Firmata.Protocol.EEPROM
 {
@@ -16,7 +17,7 @@ namespace Arduino.Firmata.Protocol.EEPROM
         public const byte EEPROM_PUT = 0x04;
         public const byte EEPROM_GET = 0x05;
 
-        public static int EEPROM_Length(this ArduinoSession session)
+        private static void Request_EEPROM_Length(this ArduinoSession session)
         {
             var command = new[]
             {
@@ -26,10 +27,18 @@ namespace Arduino.Firmata.Protocol.EEPROM
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
-
-            return session.GetMessageFromQueue<EEPROM_LengthResponse>().Value.Value;
         }
-        public static byte EEPROM_Read(this ArduinoSession session, int index)
+        public static int EEPROM_Length(this ArduinoSession session)
+        {
+            Request_EEPROM_Length(session);
+            return session.GetMessageFromQueue<int>(EEPROM_DATA, EEPROM_LENGTH).Value.Value;
+        }
+        public static async Task<int> EEPROM_LengthAsync(this ArduinoSession session)
+        {
+            Request_EEPROM_Length(session);
+            return await Task.Run(() => session.GetMessageFromQueue<int>(EEPROM_DATA, EEPROM_LENGTH).Value.Value).ConfigureAwait(false);
+        }
+        private static void Request_EEPROM_Read(this ArduinoSession session, int index)
         {
             var bytes = index.encode32BitSignedInteger();
 
@@ -46,11 +55,18 @@ namespace Arduino.Firmata.Protocol.EEPROM
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
-
-            return session.GetMessageFromQueue<EEPROM_ReadResponse>().Value.Value;
         }
-
-        public static void EEPROM_Write(this ArduinoSession session, int index, byte value)
+        public static byte EEPROM_Read(this ArduinoSession session, int index)
+        {
+            Request_EEPROM_Read(session, index);
+            return session.GetMessageFromQueue<byte>(EEPROM_DATA, EEPROM_READ).Value.Value;
+        }
+        public static async Task<byte> EEPROM_ReadAsync(this ArduinoSession session, int index)
+        {
+            Request_EEPROM_Read(session, index);
+            return await Task.Run(() => session.GetMessageFromQueue<byte>(EEPROM_DATA, EEPROM_READ).Value.Value).ConfigureAwait(false);
+        }
+        public static void Request_EEPROM_Write(this ArduinoSession session, int index, byte value)
         {
             var indexBytes = index.encode32BitSignedInteger();
             var valueBytes = value.encode8BitSignedByte();
@@ -70,7 +86,18 @@ namespace Arduino.Firmata.Protocol.EEPROM
             };
             session.Write(command, 0, command.Length);
         }
-        public static void EEPROM_Update(this ArduinoSession session, int index, byte value)
+
+        public static void EEPROM_Write(this ArduinoSession session, int index, byte value)
+        {
+            Request_EEPROM_Write(session, index, value);
+            session.GetMessageFromQueue(EEPROM_DATA, EEPROM_WRITE);
+        }
+        public static async Task EEPROM_WriteAsync(this ArduinoSession session, int index, byte value)
+        {
+            Request_EEPROM_Write(session, index, value);
+            await Task.Run(() => session.GetMessageFromQueue(EEPROM_DATA, EEPROM_WRITE)).ConfigureAwait(false);
+        }
+        public static void Request_EEPROM_Update(this ArduinoSession session, int index, byte value)
         {
             var indexBytes = index.encode32BitSignedInteger();
             var valueBytes = value.encode8BitSignedByte();
@@ -90,7 +117,17 @@ namespace Arduino.Firmata.Protocol.EEPROM
             };
             session.Write(command, 0, command.Length);
         }
-        public static void EEPROM_Put(this ArduinoSession session, int index, byte[] bytes)
+        public static void EEPROM_Update(this ArduinoSession session, int index, byte value)
+        {
+            Request_EEPROM_Update(session, index, value);
+            session.GetMessageFromQueue(EEPROM_DATA, EEPROM_UPDATE);
+        }
+        public static async Task EEPROM_UpdateAsync(this ArduinoSession session, int index, byte value)
+        {
+            Request_EEPROM_Update(session, index, value);
+            await Task.Run(() => session.GetMessageFromQueue(EEPROM_DATA, EEPROM_UPDATE)).ConfigureAwait(false);
+        }
+        public static void Request_EEPROM_Put(this ArduinoSession session, int index, byte[] bytes)
         {
             if (bytes == null || bytes.Length <= 0)
                 throw new ArgumentOutOfRangeException(nameof(bytes), "bytes 不能为空且长度必须大于0");
@@ -116,7 +153,17 @@ namespace Arduino.Firmata.Protocol.EEPROM
 
             session.Write(command.ToArray(), 0, command.Count);
         }
-        public static byte[] EEPROM_Get(this ArduinoSession session, int index, int length)
+        public static void EEPROM_Put(this ArduinoSession session, int index, byte[] bytes)
+        {
+            Request_EEPROM_Put(session, index, bytes);
+            session.GetMessageFromQueue(EEPROM_DATA, EEPROM_PUT);
+        }
+        public static async Task EEPROM_PutAsync(this ArduinoSession session, int index, byte[] bytes)
+        {
+            Request_EEPROM_Put(session, index, bytes);
+            await Task.Run(() => session.GetMessageFromQueue(EEPROM_DATA, EEPROM_PUT)).ConfigureAwait(false);
+        }
+        public static void Request_EEPROM_Get(this ArduinoSession session, int index, int length)
         {
             if (length <= 0)
                 throw new ArgumentOutOfRangeException(nameof(length), "length 必须大于0");
@@ -141,7 +188,16 @@ namespace Arduino.Firmata.Protocol.EEPROM
                 Utility.SysExEnd
             };
             session.Write(command, 0, command.Length);
-            return session.GetMessageFromQueue<EEPROM_BytesResponse>().Value.Value;
+        }
+        public static byte[] EEPROM_Get(this ArduinoSession session, int index, int length)
+        {
+            Request_EEPROM_Get(session, index, length);
+            return session.GetMessageFromQueue<byte[]>(EEPROM_DATA, EEPROM_GET).Value.Value;
+        }
+        public static async Task<byte[]> EEPROM_GetAsync(this ArduinoSession session, int index, int length)
+        {
+            Request_EEPROM_Get(session, index, length);
+            return await Task.Run(() => session.GetMessageFromQueue<byte[]>(EEPROM_DATA, EEPROM_GET).Value.Value).ConfigureAwait(false);
         }
     }
 }

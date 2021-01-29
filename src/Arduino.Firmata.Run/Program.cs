@@ -69,8 +69,8 @@ namespace Solid.Arduino.Run
 
                 //AnalogPinTest(connection);
                 //DigitalPinTest(connection);
-                EEPROMTest(connection);
-                //NeoPixelTest(connection);
+                //EEPROMTest(connection);
+                NeoPixelTest(connection);
 
                 //StepperTest(connection, session =>
                 //{
@@ -176,8 +176,8 @@ namespace Solid.Arduino.Run
         private static IDataConnection GetSerialConnection()
         {
             Console.WriteLine("正在搜索Arduino连接...");
-            var connection = new SerialConnection("COM9", 57600);
-            //var connection = new SerialConnection("COM5", 115200);
+            //var connection = new SerialConnection("COM9", 57600);
+            var connection = new SerialConnection("COM4", 115200);
 
             //EnhancedSerialConnection.Find();
 
@@ -241,20 +241,17 @@ namespace Solid.Arduino.Run
             var protocolVersion = session.GetProtocolVersion();//获取协议信息
 
             var s1 = session.EEPROM_Length();
-            session.EEPROM_Write(8, 247);
-            var s2 = session.EEPROM_Read(8);
+            session.EEPROM_Write(247, 247);
+            var s2 = session.EEPROM_Read(247);
             session.EEPROM_Update(8, 222);
             var s3 = session.EEPROM_Read(8);
-            var bytes = new byte[/*s1-512*/]
-                {
-                0,62,63,127,191,255
-                };
-            //for (int i = 0; i < bytes.Length; i++)
-            //{
-            //    bytes[i] = (byte)(i % 255);
-            //}
-            session.EEPROM_Put(2, bytes);
-            var s4 = session.EEPROM_Get(2,/* bytes.Length*/20);
+            var bytes = new byte[45/*s1-512*/];
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                bytes[i] = (byte)(i % 255);
+            }
+            session.EEPROM_Put(0, bytes);
+            var s4 = session.EEPROM_Get(0,/* bytes.Length*/s1);
         }
         private static void NeoPixelTest(IDataConnection connection)
         {
@@ -270,37 +267,51 @@ namespace Solid.Arduino.Run
             var firmware = session.GetFirmware();//获取固件信息
             var protocolVersion = session.GetProtocolVersion();//获取协议信息
 
-            session.NeoPixelConfiguration(0, 16, 6);
-            //session.NeoPixelConfiguration(0);
-            //session.NeoPixelSetPin(0, 6);
-            //session.NeoPixelUpdateLength(0, 2560);
-            //session.NeoPixelUpdateType(0, NeoPixelType.NEO_GRB | NeoPixelType.NEO_KHZ800);
-            session.NeoPixelBegin(0);
-            session.NeoPixelClear(0);
+            //session.NeoPixelConfiguration(2, 5120, 6);
             //session.NeoPixelConfiguration(1, 64);
-            session.NeoPixelSetPixelColor(0, 1, 255, 0, 0);
-            session.NeoPixelSetPixelColor(0, 2, 0, 255, 0, 10);
-            session.NeoPixelSetPixelColor(0, 3, System.Drawing.Color.White.ToArgb());
-            session.NeoPixelFill(0, System.Drawing.Color.DarkBlue, 4, 4);
-            session.NeoPixelSetBrightness(0, 10);
-            session.NeoPixelShow(0);
+            session.NeoPixelConfiguration(1);
+            session.NeoPixelSetPin(1, 6);
+            session.NeoPixelUpdateLength(1, 4960);
+            session.NeoPixelUpdateType(1, NeoPixelType.NEO_GRB | NeoPixelType.NEO_KHZ800);
+            session.NeoPixelBegin(1);
+            session.NeoPixelClear(1);
+            session.NeoPixelSetPixelColor(1, 1, 240, 0, 0);//13
+            session.NeoPixelSetPixelColor(1, 2, 0, 247, 0, 10);//15
+            session.NeoPixelSetPixelColor(1, 3, System.Drawing.Color.White.ToArgb());//12
+            session.NeoPixelFill(1, System.Drawing.Color.DarkBlue, 4, 4);
+            session.NeoPixelSetBrightness(1, 240);
+            session.NeoPixelShow(1);
+            var s1_0 = session.NeoPixelGetBrightness(1);
+            session.NeoPixelClear(1);
+            var mmm = new[] { 5,6,7,8,9,10,11,12,19,24,25,26,27,28,29,30,31,35,40,41,42,43,44,45,46,47,51,59,60,61,62,63};
+
+            //mmm.AsParallel().ForAll(item =>
+            //{
+            //    session.NeoPixelSetPixelColor(1, item, System.Drawing.Color.Blue.ToArgb());//12
+            //});
+            foreach (var item in mmm)
+            {
+                session.NeoPixelSetPixelColor(1, item, System.Drawing.Color.Blue.ToArgb());//12
+            }
+            session.NeoPixelSetBrightness(1, 20);
+            session.NeoPixelShow(1);
 
             var s = System.Drawing.Color.Red.ToArgb();
-            var s1 = session.NeoPixelGetBrightness(0);
-            var s2 = session.NeoPixelCanShow(0);
-            var s3 = session.NeoPixelGetPin(0);
-            var s4 = session.NeoPixelNumPixels(0);
+            var s1 = session.NeoPixelGetBrightness(1);
+            var s2 = session.NeoPixelCanShow(1);
+            var s3 = session.NeoPixelGetPin(1);
+            var s4 = session.NeoPixelNumPixels(1);
 
-            var s5 = session.NeoPixelGetPixelColor(0, 2);
-            var s6 = session.NeoPixelSine8(0, 5);
-            var s7 = session.NeoPixelGamma8(0, 5);
-            var s8 = session.NeoPixelGamma32(0, 5);
-            var s9 = session.NeoPixelColor(0, 255, 0, 0);
-            var s10 = session.NeoPixelColor(0, 255, 0, 0, 5);
-            //var s11 = session.NeoPixelColorHSV(0, 5, 5, 5);
+            var s5 = session.NeoPixelGetPixelColor(1, 2);
+            var s6 = session.NeoPixelSine8(1, 5);
+            var s7 = session.NeoPixelGamma8(1, 105);
+            var s8 = session.NeoPixelGamma32(1, 105);
+            var s9 = session.NeoPixelColor(1, 255, 0, 0);
+            var s10 = session.NeoPixelColor(1, 255, 0, 0, 5);
+            //var s11 = session.NeoPixelColorHSV(1, 5, 5, 5);
 
-            session.NeoPixelSetPixelColor(0, 8, s9.Value);
-            session.NeoPixelShow(0);
+            //session.NeoPixelSetPixelColor(0, 8, s9.Value);
+            //session.NeoPixelShow(0);
         }
         private static void test1(IDataConnection connection)
         {

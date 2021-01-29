@@ -20,47 +20,67 @@ namespace Arduino.Firmata.Protocol.EEPROM
 
         public IFirmataMessage Header(MessageHeader messageHeader)
         {
-            var messageByte = (byte)messageHeader.MessageBuffer[1];
-            var messageByte2 = (byte)messageHeader.MessageBuffer[2];
-            if (messageByte == EEPROMProtocol.EEPROM_DATA && messageByte2 == EEPROMProtocol.EEPROM_LENGTH)
-                return HeaderLengthMessage(messageHeader);
-            else if (messageByte == EEPROMProtocol.EEPROM_DATA && messageByte2 == EEPROMProtocol.EEPROM_READ)
-                return HeaderReadMessage(messageHeader);
-            else if (messageByte == EEPROMProtocol.EEPROM_DATA && messageByte2 == EEPROMProtocol.EEPROM_GET)
+            var messageTypeByte = (byte)messageHeader.MessageBuffer[1];
+            var messageSubTypeByte = (byte)messageHeader.MessageBuffer[2];
+            if (messageTypeByte == EEPROMProtocol.EEPROM_DATA && messageSubTypeByte == EEPROMProtocol.EEPROM_LENGTH)
+                return HeaderReturnInt(messageHeader);
+            else if (messageTypeByte == EEPROMProtocol.EEPROM_DATA && messageSubTypeByte == EEPROMProtocol.EEPROM_READ)
+                return HeaderReturnByte(messageHeader);
+            else if (messageTypeByte == EEPROMProtocol.EEPROM_DATA && messageSubTypeByte == EEPROMProtocol.EEPROM_GET)
                 return HeaderGetMessage(messageHeader);
+            else if (messageTypeByte == EEPROMProtocol.EEPROM_DATA &&
+                 (messageSubTypeByte == EEPROMProtocol.EEPROM_WRITE || messageSubTypeByte == EEPROMProtocol.EEPROM_UPDATE || messageSubTypeByte == EEPROMProtocol.EEPROM_PUT)
+                 )
+                return HeaderGenericVoidMessage(messageHeader);
+
             else
                 throw new NotImplementedException();
         }
-        private IFirmataMessage HeaderLengthMessage(MessageHeader messageHeader)
+        private IFirmataMessage HeaderGenericVoidMessage(MessageHeader messageHeader)
+        {
+            var currentState = new GenericResponse
+            {
+                MessageType = (byte)messageHeader.MessageBuffer[1],
+                MessageSubType = (byte)messageHeader.MessageBuffer[2],
+            };
+            return new FirmataMessage<GenericResponse>(currentState);
+        }
+        private IFirmataMessage HeaderReturnInt(MessageHeader messageHeader)
         {
             var value = (int)NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[3], (byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7]);
 
-            var currentState = new EEPROM_LengthResponse
+            var currentState = new GenericResponse<int>
             {
+                MessageType = (byte)messageHeader.MessageBuffer[1],
+                MessageSubType = (byte)messageHeader.MessageBuffer[2],
                 Value = value
             };
-            return new FirmataMessage<EEPROM_LengthResponse>(currentState);
+            return new FirmataMessage<GenericResponse<int>>(currentState);
         }
-        private IFirmataMessage HeaderReadMessage(MessageHeader messageHeader)
+        private IFirmataMessage HeaderReturnByte(MessageHeader messageHeader)
         {
             var value = NumberExtensions.decode8BitSignedByte((byte)messageHeader.MessageBuffer[3], (byte)messageHeader.MessageBuffer[4]);
 
-            var currentState = new EEPROM_ReadResponse
+            var currentState = new GenericResponse<byte>
             {
+                MessageType = (byte)messageHeader.MessageBuffer[1],
+                MessageSubType = (byte)messageHeader.MessageBuffer[2],
                 Value = value
             };
-            return new FirmataMessage<EEPROM_ReadResponse>(currentState);
+            return new FirmataMessage<GenericResponse<byte>>(currentState);
         }
         private IFirmataMessage HeaderGetMessage(MessageHeader messageHeader)
         {
             var value7Bit = messageHeader.MessageBuffer.Skip(3).Take(messageHeader.MessageBufferIndex - 3).Select(f => (byte)f).ToArray();
 
             var value = ByteArrayExtensions.Decode7Bit(value7Bit);
-            var currentState = new EEPROM_BytesResponse
+            var currentState = new GenericResponse<byte[]>
             {
+                MessageType = (byte)messageHeader.MessageBuffer[1],
+                MessageSubType = (byte)messageHeader.MessageBuffer[2],
                 Value = value
             };
-            return new FirmataMessage<EEPROM_BytesResponse>(currentState);
+            return new FirmataMessage<GenericResponse<byte[]>>(currentState);
         }
     }
 }

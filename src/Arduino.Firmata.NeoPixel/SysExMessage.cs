@@ -20,44 +20,101 @@ namespace Arduino.Firmata.Protocol.NeoPixel
 
         public IFirmataMessage Header(MessageHeader messageHeader)
         {
-            var messageByte = (byte)messageHeader.MessageBuffer[1];
-            var messageByte2 = (byte)messageHeader.MessageBuffer[2];
-            if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_CAN_SHOW)
-                return CanShow(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GET_PIXELS)
+            var messageTypeByte = (byte)messageHeader.MessageBuffer[1];
+            var messageSubTypeByte = (byte)messageHeader.MessageBuffer[2];
+            if (messageTypeByte == NeoPixelProtocol.NEOPIXEL_DATA && messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_REPORT_CAN_SHOW)
+                return HeaderReturnBool(messageHeader);
+            else if (messageTypeByte == NeoPixelProtocol.NEOPIXEL_DATA && messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_REPORT_GET_PIXELS)
                 return GetPixels(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GET_BRIGHTNESS)
-                return GetBrightness(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GET_PIN)
+            else if (messageTypeByte == NeoPixelProtocol.NEOPIXEL_DATA && messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_REPORT_GET_BRIGHTNESS)
+                return HeaderReturnByte(messageHeader);
+            else if (messageTypeByte == NeoPixelProtocol.NEOPIXEL_DATA && messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_REPORT_GET_PIN)
                 return GetPin(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_NUM_PIXELS)
-                return NumPixels(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GET_PIXEL_COLOR)
-                return GetPixelColor(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_SINE8)
-                return GetSine8(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GAMMA8)
-                return GetGamma8(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_GAMMA32)
-                return GetGamma32(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_COLOR)
-                return Color(messageHeader);
-            else if (messageByte == NeoPixelProtocol.NEOPIXEL_DATA && messageByte2 == NeoPixelProtocol.NEOPIXEL_REPORT_COLORHSV)
-                return ColorHSV(messageHeader);
+            else if (messageTypeByte == NeoPixelProtocol.NEOPIXEL_DATA && messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_REPORT_NUM_PIXELS)
+                return HeaderReturnInt(messageHeader);
+            else if (messageTypeByte == NeoPixelProtocol.NEOPIXEL_DATA && messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_REPORT_GET_PIXEL_COLOR)
+                return HeaderReturnInt(messageHeader);
+            else if (messageTypeByte == NeoPixelProtocol.NEOPIXEL_DATA && messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_REPORT_SINE8)
+                return HeaderReturnByte(messageHeader);
+            else if (messageTypeByte == NeoPixelProtocol.NEOPIXEL_DATA && messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_REPORT_GAMMA8)
+                return HeaderReturnByte(messageHeader);
+            else if (messageTypeByte == NeoPixelProtocol.NEOPIXEL_DATA && messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_REPORT_GAMMA32)
+                return HeaderReturnInt(messageHeader);
+            else if (messageTypeByte == NeoPixelProtocol.NEOPIXEL_DATA && messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_REPORT_COLOR)
+                return HeaderReturnInt(messageHeader);
+            else if (messageTypeByte == NeoPixelProtocol.NEOPIXEL_DATA && messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_REPORT_COLORHSV)
+                return HeaderReturnInt(messageHeader);
+            else if (messageTypeByte == NeoPixelProtocol.NEOPIXEL_DATA &&
+             (messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_CONFIG || messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_BEGIN || messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_SHOW || messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_CLEAR
+              || messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_SET_PIXEL_COLOR || messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_FILL || messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_UPDATE_LENGTH
+              || messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_UPDATE_TYPE || messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_SET_PIN || messageSubTypeByte == NeoPixelProtocol.NEOPIXEL_SET_BRIGHTNESS)
+             )
+                return HeaderGenericVoidMessage(messageHeader);
+
             else
                 throw new NotImplementedException();
         }
-        private IFirmataMessage CanShow(MessageHeader messageHeader)
+        private IFirmataMessage HeaderGenericVoidMessage(MessageHeader messageHeader)
         {
-            var deviceNumber = messageHeader.MessageBuffer[3];
+            var currentState = new GenericResponse
+            {
+                MessageType = (byte)messageHeader.MessageBuffer[1],
+                MessageSubType = (byte)messageHeader.MessageBuffer[2],
+                DeviceNumber = (byte)messageHeader.MessageBuffer[3],
+            };
+            return new FirmataMessage<GenericResponse>(currentState);
+        }
+        private IFirmataMessage HeaderReturnBool(MessageHeader messageHeader)
+        {
             var value = Convert.ToBoolean(messageHeader.MessageBuffer[4]);
 
-            var currentState = new CanShow
+            var currentState = new GenericResponse<bool>
             {
-                DeviceNumber = deviceNumber,
+                MessageType = (byte)messageHeader.MessageBuffer[1],
+                MessageSubType = (byte)messageHeader.MessageBuffer[2],
+                DeviceNumber = messageHeader.MessageBuffer[3],
                 Value = value
             };
-            return new FirmataMessage<CanShow>(currentState);
+            return new FirmataMessage<GenericResponse<bool>>(currentState);
+        }
+        private IFirmataMessage HeaderReturnByte(MessageHeader messageHeader)
+        {
+            var value = NumberExtensions.decode8BitSignedByte((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5]);
+
+            var currentState = new GenericResponse<byte>
+            {
+                MessageType = (byte)messageHeader.MessageBuffer[1],
+                MessageSubType = (byte)messageHeader.MessageBuffer[2],
+                DeviceNumber = messageHeader.MessageBuffer[3],
+                Value = value
+            };
+            return new FirmataMessage<GenericResponse<byte>>(currentState);
+        }
+        private IFirmataMessage HeaderReturnInt(MessageHeader messageHeader)
+        {
+            var value = (int)NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7], (byte)messageHeader.MessageBuffer[8]);
+
+            var currentState = new GenericResponse<int>
+            {
+                MessageType = (byte)messageHeader.MessageBuffer[1],
+                MessageSubType = (byte)messageHeader.MessageBuffer[2],
+                DeviceNumber = messageHeader.MessageBuffer[3],
+                Value = value
+            };
+            return new FirmataMessage<GenericResponse<int>>(currentState);
+        }
+        private IFirmataMessage GetPin(MessageHeader messageHeader)
+        {
+            var value = (byte)messageHeader.MessageBuffer[4];
+
+            var currentState = new GenericResponse<byte>
+            {
+                MessageType = (byte)messageHeader.MessageBuffer[1],
+                MessageSubType = (byte)messageHeader.MessageBuffer[2],
+                DeviceNumber = messageHeader.MessageBuffer[3],
+                Value = value
+            };
+            return new FirmataMessage<GenericResponse<byte>>(currentState);
         }
         private IFirmataMessage GetPixels(MessageHeader messageHeader)
         {
@@ -71,116 +128,6 @@ namespace Arduino.Firmata.Protocol.NeoPixel
             //};
             //return new FirmataMessage<CanShow>(currentState);
             throw new Exception("功能未实现");
-        }
-        private IFirmataMessage GetBrightness(MessageHeader messageHeader)
-        {
-            var deviceNumber = messageHeader.MessageBuffer[3];
-            var value = (byte)messageHeader.MessageBuffer[4];
-
-            var currentState = new Brightness
-            {
-                DeviceNumber = deviceNumber,
-                Value = value
-            };
-            return new FirmataMessage<Brightness>(currentState);
-        }
-        private IFirmataMessage GetPin(MessageHeader messageHeader)
-        {
-            var deviceNumber = messageHeader.MessageBuffer[3];
-            var value = (byte)messageHeader.MessageBuffer[4];
-
-            var currentState = new Pin
-            {
-                DeviceNumber = deviceNumber,
-                Value = value
-            };
-            return new FirmataMessage<Pin>(currentState);
-        }
-        private IFirmataMessage NumPixels(MessageHeader messageHeader)
-        {
-            var deviceNumber = messageHeader.MessageBuffer[3];
-            var value = (int)NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7], (byte)messageHeader.MessageBuffer[8]);
-
-            var currentState = new NumPixels
-            {
-                DeviceNumber = deviceNumber,
-                Value = value
-            };
-            return new FirmataMessage<NumPixels>(currentState);
-        }
-
-        private IFirmataMessage GetPixelColor(MessageHeader messageHeader)
-        {
-            var deviceNumber = messageHeader.MessageBuffer[3];
-            var value = (int)NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7], (byte)messageHeader.MessageBuffer[8]);
-
-            var currentState = new GetPixelColor
-            {
-                DeviceNumber = deviceNumber,
-                Value = value
-            };
-            return new FirmataMessage<GetPixelColor>(currentState);
-        }
-
-        private IFirmataMessage GetSine8(MessageHeader messageHeader)
-        {
-            var deviceNumber = messageHeader.MessageBuffer[3];
-            var value = (byte)messageHeader.MessageBuffer[4];
-
-            var currentState = new Sine8
-            {
-                DeviceNumber = deviceNumber,
-                Value = value
-            };
-            return new FirmataMessage<Sine8>(currentState);
-        }
-        private IFirmataMessage GetGamma8(MessageHeader messageHeader)
-        {
-            var deviceNumber = messageHeader.MessageBuffer[3];
-            var value = (byte)messageHeader.MessageBuffer[4];
-
-            var currentState = new Gamma8
-            {
-                DeviceNumber = deviceNumber,
-                Value = value
-            };
-            return new FirmataMessage<Gamma8>(currentState);
-        }
-        private IFirmataMessage GetGamma32(MessageHeader messageHeader)
-        {
-            var deviceNumber = messageHeader.MessageBuffer[3];
-            var value = (int)NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7], (byte)messageHeader.MessageBuffer[8]);
-
-            var currentState = new Gamma32
-            {
-                DeviceNumber = deviceNumber,
-                Value = value
-            };
-            return new FirmataMessage<Gamma32>(currentState);
-        }
-        private IFirmataMessage Color(MessageHeader messageHeader)
-        {
-            var deviceNumber = messageHeader.MessageBuffer[3];
-            var value = (int)NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7], (byte)messageHeader.MessageBuffer[8]);
-
-            var currentState = new PixelColor
-            {
-                DeviceNumber = deviceNumber,
-                Value = value
-            };
-            return new FirmataMessage<PixelColor>(currentState);
-        }
-        private IFirmataMessage ColorHSV(MessageHeader messageHeader)
-        {
-            var deviceNumber = messageHeader.MessageBuffer[3];
-            var value = (int)NumberExtensions.decode32BitSignedInteger((byte)messageHeader.MessageBuffer[4], (byte)messageHeader.MessageBuffer[5], (byte)messageHeader.MessageBuffer[6], (byte)messageHeader.MessageBuffer[7], (byte)messageHeader.MessageBuffer[8]);
-
-            var currentState = new ColorHSV
-            {
-                DeviceNumber = deviceNumber,
-                Value = value
-            };
-            return new FirmataMessage<ColorHSV>(currentState);
         }
     }
 }
