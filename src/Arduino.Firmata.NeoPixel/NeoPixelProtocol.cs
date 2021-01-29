@@ -1,6 +1,7 @@
 ﻿using Arduino.Firmata.Extend;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -545,11 +546,11 @@ gamma32			KEYWORD2
         }
         public static void NeoPixelSetPixelColor(this ArduinoSession session, int deviceNumber, int n, System.Drawing.Color color)
         {
-            NeoPixelSetPixelColor(session, deviceNumber, n, color.ToArgb());
+            NeoPixelSetPixelColor(session, deviceNumber, n, convertColor(color));
         }
         public static async Task NeoPixelSetPixelColorAsync(this ArduinoSession session, int deviceNumber, int n, System.Drawing.Color color)
         {
-            await NeoPixelSetPixelColorAsync(session, deviceNumber, n, color.ToArgb());
+            await NeoPixelSetPixelColorAsync(session, deviceNumber, n, convertColor(color));
         }
         private static void requestNeoPixelFill(this ArduinoSession session, int deviceNumber, int color, int first, int count)
         {
@@ -597,11 +598,11 @@ gamma32			KEYWORD2
         }
         public static void NeoPixelFill(this ArduinoSession session, int deviceNumber, System.Drawing.Color color, int first, int count)
         {
-            NeoPixelFill(session, deviceNumber, color.ToArgb(), first, count);
+            NeoPixelFill(session, deviceNumber, convertColor(color), first, count);
         }
         public static async Task NeoPixelFillAsync(this ArduinoSession session, int deviceNumber, System.Drawing.Color color, int first, int count)
         {
-            await NeoPixelFillAsync(session, deviceNumber, color.ToArgb(), first, count);
+            await NeoPixelFillAsync(session, deviceNumber, convertColor(color), first, count);
         }
         private static void requestNeoPixelSetBrightness(this ArduinoSession session, int deviceNumber, byte b)
         {
@@ -930,6 +931,14 @@ gamma32			KEYWORD2
         }
         public static int NeoPixelColor(this ArduinoSession session, int deviceNumber, byte red, byte green, byte blue, byte? white = null)
         {
+            //if (white.HasValue)
+            //{
+            //    return convertColor(red, green, blue, white.Value);
+            //}
+            //else
+            //{
+            //    return convertColor(red, green, blue);
+            //}
             requestNeoPixelColor(session, deviceNumber, red, green, blue, white);
             return getMessageFromQueue<int>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_COLOR, deviceNumber).Value.Value;
         }
@@ -937,6 +946,7 @@ gamma32			KEYWORD2
         {
             requestNeoPixelColor(session, deviceNumber, red, green, blue, white);
             return await Task.Run(() => getMessageFromQueue<int>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_COLOR, deviceNumber).Value.Value).ConfigureAwait(false);
+            //return await Task.Run(() => NeoPixelColor(session, deviceNumber, red, green, blue, white));
         }
 
         private static void requestNeoPixelColorHSV(this ArduinoSession session, int deviceNumber, int hue, byte sat, byte val)
@@ -975,6 +985,46 @@ gamma32			KEYWORD2
         {
             requestNeoPixelColorHSV(session, deviceNumber, hue, sat, val);
             return await Task.Run(() => getMessageFromQueue<int>(session, NEOPIXEL_DATA, NEOPIXEL_REPORT_COLORHSV, deviceNumber).Value.Value).ConfigureAwait(false);
+        }
+
+        private static int convertColor(Color color)
+        {
+            return convertColor(color.R, color.B, color.G);
+        }
+
+        /// <summary>
+        /// Convert separate red, green and blue values into a single "packed" 32-bit RGB color.
+        /// </summary>
+        /// <param name="r">Red brightness, 0 to 255.</param>
+        /// <param name="g">Green brightness, 0 to 255.</param>
+        /// <param name="b">Blue brightness, 0 to 255.</param>
+        /// <returns>
+        /// 32-bit packed RGB value, which can then be assigned to a
+        /// variable for later use or passed to the setPixelColor()
+        /// function. Packed RGB format is predictable, regardless of
+        /// LED strand color order.
+        /// </returns>
+        private static int convertColor(byte r, byte g, byte b)
+        {
+            return (r << 16) | (g << 8) | b;
+        }
+
+        /// <summary>
+        /// Convert separate red, green, blue and white values into a single "packed" 32-bit WRGB color.
+        /// </summary>
+        /// <param name="r">Red brightness, 0 to 255.</param>
+        /// <param name="g">Green brightness, 0 to 255.</param>
+        /// <param name="b">Blue brightness, 0 to 255.</param>
+        /// <param name="w">White brightness, 0 to 255.</param>
+        /// <returns>
+        /// 32-bit packed WRGB value, which can then be assigned to a
+        /// variable for later use or passed to the setPixelColor()
+        /// function. Packed WRGB format is predictable, regardless of
+        /// LED strand color order.
+        /// </returns>
+        private static int convertColor(byte r, byte g, byte b, byte w)
+        {
+            return (w << 24) | (r << 16) | (g << 8) | b;
         }
     }
 

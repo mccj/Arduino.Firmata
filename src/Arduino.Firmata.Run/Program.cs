@@ -19,8 +19,8 @@ namespace Solid.Arduino.Run
     {
         static void Main(string[] args)
         {
-            //var ss1 = NumberExtensions.encode8BitSignedByte(247);
-            //var ss2 = NumberExtensions.decode32BitSignedInteger(0x77,0x1,0x0,0x0,0x0);
+            var ss1 = NumberExtensions.encode32BitSignedInteger(15925248);
+            //var ss2 = NumberExtensions.decode32BitSignedInteger(0x77, 0x1, 0x0, 0x0, 0x0);
             //var s=  NumberExtensions.decode32BitSignedInteger(0, 20, 0, 0, 0);
             //var _serial = new System.IO.Ports.SerialPort("COM9", 57600/*, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One*/);
 
@@ -267,48 +267,88 @@ namespace Solid.Arduino.Run
             var firmware = session.GetFirmware();//获取固件信息
             var protocolVersion = session.GetProtocolVersion();//获取协议信息
 
+
+            //session.SetDigitalPinMode(27, PinMode.DigitalOutput);//设置引脚模式
+            //session.SetDigitalPin(27, true);
+            //session.SetDigitalPin(27, false);
+
             //session.NeoPixelConfiguration(2, 5120, 6);
-            //session.NeoPixelConfiguration(1, 64);
-            session.NeoPixelConfiguration(1);
-            session.NeoPixelSetPin(1, 6);
-            session.NeoPixelUpdateLength(1, 4960);
-            session.NeoPixelUpdateType(1, NeoPixelType.NEO_GRB | NeoPixelType.NEO_KHZ800);
-            session.NeoPixelBegin(1);
-            session.NeoPixelClear(1);
-            session.NeoPixelSetPixelColor(1, 1, 240, 0, 0);//13
-            session.NeoPixelSetPixelColor(1, 2, 0, 247, 0, 10);//15
-            session.NeoPixelSetPixelColor(1, 3, System.Drawing.Color.White.ToArgb());//12
-            session.NeoPixelFill(1, System.Drawing.Color.DarkBlue, 4, 4);
-            session.NeoPixelSetBrightness(1, 240);
-            session.NeoPixelShow(1);
-            var s1_0 = session.NeoPixelGetBrightness(1);
-            session.NeoPixelClear(1);
-            var mmm = new[] { 5,6,7,8,9,10,11,12,19,24,25,26,27,28,29,30,31,35,40,41,42,43,44,45,46,47,51,59,60,61,62,63};
+            session.NeoPixelConfiguration(1, 80, 6);
+            ////session.NeoPixelConfiguration(1);
+            ////session.NeoPixelSetPin(1, 6);
+            ////session.NeoPixelUpdateLength(1, 4960);
+            ////session.NeoPixelUpdateType(1, NeoPixelType.NEO_GRB | NeoPixelType.NEO_KHZ800);
+            //session.NeoPixelBegin(1);
+            //session.NeoPixelClear(1);
+            //session.NeoPixelSetPixelColor(1, 1, 240, 0, 0);//13
+            //session.NeoPixelSetPixelColor(1, 2, 0, 247, 0, 10);//15
+            //session.NeoPixelSetPixelColor(1, 3, System.Drawing.Color.White);//12
+            //session.NeoPixelFill(1, System.Drawing.Color.DarkBlue, 4, 4);
+            //session.NeoPixelSetBrightness(1, 240);
+            //session.NeoPixelShow(1);
+            //var s1_0 = session.NeoPixelGetBrightness(1);
+            //session.NeoPixelClear(1);
+            //var mmm = new[] { 5, 6, 7, 8, 9, 10, 11, 12, 19, 24, 25, 26, 27, 28, 29, 30, 31, 35, 40, 41, 42, 43, 44, 45, 46, 47, 51, 59, 60, 61, 62, 63 };
 
-            //mmm.AsParallel().ForAll(item =>
+            ////mmm.AsParallel().ForAll(item =>
+            ////{
+            ////    session.NeoPixelSetPixelColor(1, item, System.Drawing.Color.Blue);//12
+            ////});
+            //foreach (var item in mmm)
             //{
-            //    session.NeoPixelSetPixelColor(1, item, System.Drawing.Color.Blue.ToArgb());//12
-            //});
-            foreach (var item in mmm)
-            {
-                session.NeoPixelSetPixelColor(1, item, System.Drawing.Color.Blue.ToArgb());//12
-            }
-            session.NeoPixelSetBrightness(1, 20);
+            //    session.NeoPixelSetPixelColor(1, item, System.Drawing.Color.Blue);//12
+            //}
+            //session.NeoPixelSetBrightness(1, 20);
+            //session.NeoPixelShow(1);
+
+            session.NeoPixelClear(1);
+            session.NeoPixelSetBrightness(1, 50);
+            session.NeoPixelFill(1, System.Drawing.Color.Blue, 0, 8);
+            session.NeoPixelShow(1);
+            session.NeoPixelFill(1, System.Drawing.Color.Red, 8, 8);
+            session.NeoPixelShow(1);
+            session.NeoPixelFill(1, System.Drawing.Color.Green, 16, 8);
+            session.NeoPixelShow(1);
+            session.NeoPixelFill(1, System.Drawing.Color.White, 24, 8);
             session.NeoPixelShow(1);
 
-            var s = System.Drawing.Color.Red.ToArgb();
-            var s1 = session.NeoPixelGetBrightness(1);
-            var s2 = session.NeoPixelCanShow(1);
-            var s3 = session.NeoPixelGetPin(1);
-            var s4 = session.NeoPixelNumPixels(1);
+            session.NeoPixelClear(1);
+            session.NeoPixelSetBrightness(1, 20);
+            session.NeoPixelSetPixelColor(1, 0, 255, 0, 0);
+            session.NeoPixelSetPixelColor(1, 1, System.Drawing.Color.Red);
 
-            var s5 = session.NeoPixelGetPixelColor(1, 2);
-            var s6 = session.NeoPixelSine8(1, 5);
-            var s7 = session.NeoPixelGamma8(1, 105);
-            var s8 = session.NeoPixelGamma32(1, 105);
-            var s9 = session.NeoPixelColor(1, 255, 0, 0);
-            var s10 = session.NeoPixelColor(1, 255, 0, 0, 5);
-            //var s11 = session.NeoPixelColorHSV(1, 5, 5, 5);
+            session.NeoPixelShow(1);
+            session.NeoPixelSetPixelColor(1, 2, 0, 255, 0);
+            session.NeoPixelSetPixelColor(1, 3, System.Drawing.Color.Blue);
+            session.NeoPixelShow(1);
+            session.NeoPixelSetPixelColor(1, 4, 0, 0, 255);
+            session.NeoPixelSetPixelColor(1, 5, System.Drawing.Color.Green);
+            session.NeoPixelShow(1);
+            session.NeoPixelSetPixelColor(1, 6, 255, 255, 255);
+            session.NeoPixelSetPixelColor(1, 7, System.Drawing.Color.White);
+            //for (int i = 0; i < 80; i++)
+            //{
+            //    session.NeoPixelSetPixelColor(1, i, System.Drawing.Color.Blue);//12
+            //    //session.NeoPixelSetPixelColor(1, i, System.Drawing.Color.Red);//12
+            //    //session.NeoPixelSetPixelColor(1, i, System.Drawing.Color.Green);//12
+            //    //session.NeoPixelSetPixelColor(1, i, System.Drawing.Color.White);//12
+            //}
+            session.NeoPixelShow(1);
+
+
+            //var s = System.Drawing.Color.Red.ToArgb();
+            //var s1 = session.NeoPixelGetBrightness(1);
+            //var s2 = session.NeoPixelCanShow(1);
+            //var s3 = session.NeoPixelGetPin(1);
+            //var s4 = session.NeoPixelNumPixels(1);
+
+            //var s5 = session.NeoPixelGetPixelColor(1, 2);
+            //var s6 = session.NeoPixelSine8(1, 5);
+            //var s7 = session.NeoPixelGamma8(1, 105);
+            //var s8 = session.NeoPixelGamma32(1, 105);
+            //var s9 = session.NeoPixelColor(1, 255, 0, 0);
+            //var s10 = session.NeoPixelColor(1, 255, 0, 0, 5);
+            ////var s11 = session.NeoPixelColorHSV(1, 5, 5, 5);
 
             //session.NeoPixelSetPixelColor(0, 8, s9.Value);
             //session.NeoPixelShow(0);
@@ -489,6 +529,7 @@ namespace Solid.Arduino.Run
             session.SetDigitalPinMode(5, PinMode.DigitalInput);//设置引脚模式
             session.SetDigitalPinMode(4, PinMode.DigitalInput);//设置引脚模式
             session.SetDigitalPinMode(3, PinMode.DigitalInput);//设置引脚模式
+            session.SetDigitalPinMode(38, PinMode.DigitalInput);//设置引脚模式
 
 
             //session.CreateDigitalStateMonitor().PortStateChange(f =>
@@ -502,8 +543,34 @@ namespace Solid.Arduino.Run
 
             session.SetDigitalReportMode(0, true);//设置监控报告
             session.SetDigitalReportMode(1, true);//设置监控报告
+            session.SetDigitalReportMode(2, true);//设置监控报告
+            session.SetDigitalReportMode(3, true);//设置监控报告
+            session.SetDigitalReportMode(4, true);//设置监控报告
+            session.SetDigitalReportMode(5, true);//设置监控报告
+            session.SetDigitalReportMode(6, true);//设置监控报告
+            session.SetDigitalReportMode(7, true);//设置监控报告
                                                   //System.Threading.Thread.Sleep(1000);
                                                   //session.CreateDigitalStateMonitor().Subscribe(new eeee1("无"));//设置数字信号输入监控调用
+
+
+            var outPins = new[] {
+                27, 28, 4, 5, 8, 9, 10, 11, 12, 47, 48, 49,
+                15,14,16,17,
+                24, 23,
+                2, 3, 18, 19, 29, 39, 30, 31, 32, 33, 34, 35, 36, 37, 40, 41
+            };
+            foreach (var item in outPins)
+            {
+                session.SetDigitalPinMode(item, PinMode.DigitalOutput);//设置引脚模式
+            }
+            foreach (var item in outPins)
+            {
+                session.SetDigitalPin(item, true);
+            }
+            foreach (var item in outPins)
+            {
+                session.SetDigitalPin(item, false);
+            }
 
 
             while (true)

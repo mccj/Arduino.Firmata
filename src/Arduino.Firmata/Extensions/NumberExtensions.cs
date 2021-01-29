@@ -22,6 +22,15 @@ namespace Arduino.Firmata
             };
             return pdata;
         }
+        /// <summary>
+        /// 最大支持 268435455
+        /// </summary>
+        /// <param name="arg1"></param>
+        /// <param name="arg2"></param>
+        /// <param name="arg3"></param>
+        /// <param name="arg4"></param>
+        /// <param name="arg5"></param>
+        /// <returns></returns>
         public static long decode32BitSignedInteger(byte arg1, byte arg2, byte arg3, byte arg4, byte arg5)
         {
             long result = (long)arg1 | (long)arg2 << 7 | (long)arg3 << 14 | (long)arg4 << 21 | (((long)arg5 << 28) & 0x07);
@@ -33,6 +42,11 @@ namespace Arduino.Firmata
 
             return result;
         }
+        /// <summary>
+        /// 最大支持 268435455
+        /// </summary>
+        /// <param name="value">最大支持 268435455</param>
+        /// <returns></returns>
         public static byte[] encode32BitSignedInteger(this int value)
         {
             bool inv = false;
