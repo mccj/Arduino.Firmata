@@ -22,11 +22,11 @@ namespace Arduino.Firmata.Protocol.AccelStepper
         {
             var messageTypeByte = (byte)messageHeader.MessageBuffer[1];
             var messageSubTypeByte = (byte)messageHeader.MessageBuffer[2];
-            if (messageTypeByte == AccelStepperProtocol.ACCELSTEPPER_DATA && messageSubTypeByte == 0x06)
+            if (messageTypeByte == AccelStepperProtocol.ACCELSTEPPER_DATA && messageSubTypeByte == AccelStepperProtocol.ACCELSTEPPER_REPORT_POSITION)
                 return CreateStepperPositionResponse(messageHeader);//步进报告位置
-            else if (messageTypeByte == AccelStepperProtocol.ACCELSTEPPER_DATA && messageSubTypeByte == 0x0a)
+            else if (messageTypeByte == AccelStepperProtocol.ACCELSTEPPER_DATA && messageSubTypeByte == AccelStepperProtocol.ACCELSTEPPER_MOVE_COMPLETE)
                 return CreateStepperMoveCompleteResponse(messageHeader);//步进移动完成
-            else if (messageTypeByte == AccelStepperProtocol.ACCELSTEPPER_DATA && messageSubTypeByte == 0x24)
+            else if (messageTypeByte == AccelStepperProtocol.ACCELSTEPPER_DATA && messageSubTypeByte == AccelStepperProtocol.MULTISTEPPER_MOVE_COMPLETE)
                 return CreateMultiStepperMoveCompelteResponse(messageHeader);//批量步进移动完成
             else
                 throw new NotImplementedException();

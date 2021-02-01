@@ -14,6 +14,16 @@ namespace System.Linq
     /// </remarks>
     public static class SerialProtocol
     {
+        public const byte SERIAL_MESSAGE = 0x60; // ACCELSTEPPER_DATA(0x62)
+
+        private const byte SERIAL_CONFIG = 0x10;
+        private const byte SERIAL_WRITE = 0x20;
+        private const byte SERIAL_READ = 0x30;
+        private const byte SERIAL_REPLY = 0x40;
+        private const byte SERIAL_CLOSE = 0x50;
+        private const byte SERIAL_FLUSH = 0x60;
+        private const byte SERIAL_LISTEN = 0x70;
+
         /// <summary>
         /// Configures the specified hardware or software serial port. RX and TX pins are optional and should only be specified if the platform requires them to be set.
         /// </summary>
@@ -30,8 +40,8 @@ namespace System.Linq
             var bytes = baud.encode32BitSignedInteger();
             var command = new byte[9];
             command[0] = Utility.SysExStart;
-            command[1] = (byte)0x60;
-            command[2] = (byte)(0x10 | (int)hw);//SERIAL_CONFIG  //OR with port (0x11 = SERIAL_CONFIG | HW_SERIAL1)
+            command[1] = SERIAL_MESSAGE;
+            command[2] = (byte)(SERIAL_CONFIG | (int)hw);//SERIAL_CONFIG  //OR with port (0x11 = SERIAL_CONFIG | HW_SERIAL1)
             command[3] = bytes[0]; //baud (bits 0 - 6)
             command[4] = bytes[1]; //baud (bits 7 - 13)
             command[5] = bytes[2]; //baud (bits 14 - 20)
@@ -47,14 +57,24 @@ namespace System.Linq
             session.Write(command, 0, (rxPin.HasValue && txPin.HasValue) ? 8 : 6);
         }
 
-        public static void SerialWrite(this ArduinoSession session, HW_SERIAL hw, string value)
+        public static void SerialWrite(this ArduinoSession session, HW_SERIAL hw, string value, System.Text.Encoding encoding = null)
+        {
+            if (value == null)
+                throw new ArgumentNullException(nameof(value));
+
+            if (encoding == null) encoding = System.Text.Encoding.ASCII;
+            var b = encoding.GetBytes(value);
+
+            SerialWrite(session, hw, b);
+        }
+        public static void SerialWrite(this ArduinoSession session, HW_SERIAL hw, byte[] value)
         {
             var b = value.To14BitIso();
 
             var command = new byte[b.Length + 4];
             command[0] = Utility.SysExStart;
-            command[1] = (byte)0x60;
-            command[2] = (byte)(0x20 | (int)hw);//SERIAL_WRITE      //OR with port (0x21 = SERIAL_WRITE | HW_SERIAL1)
+            command[1] = SERIAL_MESSAGE;
+            command[2] = (byte)(SERIAL_WRITE | (int)hw);//SERIAL_WRITE      //OR with port (0x21 = SERIAL_WRITE | HW_SERIAL1)
 
             b.CopyTo(command, 3);
 
@@ -67,8 +87,8 @@ namespace System.Linq
         {
             var command = new byte[14];
             command[0] = Utility.SysExStart;
-            command[1] = (byte)0x60;
-            command[2] = (byte)(0x30 | (int)hw);//SERIAL_READ  //OR with port (0x31 = SERIAL_READ | HW_SERIAL1)
+            command[1] = SERIAL_MESSAGE;
+            command[2] = (byte)(SERIAL_READ | (int)hw);//SERIAL_READ  //OR with port (0x31 = SERIAL_READ | HW_SERIAL1)
             command[3] = continuously ? (byte)0x00 : (byte)0x01; //SERIAL_READ_MODE   0x00 => read continuously, 0x01 => stop reading
             if (maxBytesToRead.HasValue)
             {
@@ -89,8 +109,8 @@ namespace System.Linq
         {
             var command = new[] {
                 Utility.SysExStart,
-                (byte)0x60,
-                (byte)(0x50 | (int)hw),//SERIAL_CLOSE      // OR with port (0x51 = SERIAL_CLOSE | HW_SERIAL1) 
+                SERIAL_MESSAGE,
+                (byte)(SERIAL_CLOSE | (int)hw),//SERIAL_CLOSE      // OR with port (0x51 = SERIAL_CLOSE | HW_SERIAL1) 
                 Utility.SysExEnd
             };
 
@@ -100,8 +120,8 @@ namespace System.Linq
         {
             var command = new[] {
                 Utility.SysExStart,
-                (byte)0x60,
-                (byte)(0x60 | (int)hw),//SERIAL_FLUSH      OR with port (0x61 = SERIAL_FLUSH | HW_SERIAL1)
+                SERIAL_MESSAGE,
+                (byte)(SERIAL_FLUSH | (int)hw),//SERIAL_FLUSH      OR with port (0x61 = SERIAL_FLUSH | HW_SERIAL1)
                 Utility.SysExEnd
             };
 
@@ -111,8 +131,8 @@ namespace System.Linq
         {
             var command = new[] {
                 Utility.SysExStart,
-                (byte)0x60,
-                (byte)(0x70 | (int)sw),//OR with port to switch to (0x79 = switch to SW_SERIAL1)
+                SERIAL_MESSAGE,
+                (byte)(SERIAL_LISTEN | (int)sw),//OR with port to switch to (0x79 = switch to SW_SERIAL1)
                 Utility.SysExEnd
             };
 
