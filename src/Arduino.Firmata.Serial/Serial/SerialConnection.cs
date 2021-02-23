@@ -3,15 +3,15 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
-#if NETSTANDARD
-using SerialPort = RJCP.IO.Ports.SerialPortStream;
-using SerialDataReceivedEventArgs = RJCP.IO.Ports.SerialDataReceivedEventArgs;
-using SerialErrorReceivedEventArgs = RJCP.IO.Ports.SerialErrorReceivedEventArgs;
-#else
+//#if NETSTANDARD
+//using SerialPort = RJCP.IO.Ports.SerialPortStream;
+//using SerialDataReceivedEventArgs = RJCP.IO.Ports.SerialDataReceivedEventArgs;
+//using SerialErrorReceivedEventArgs = RJCP.IO.Ports.SerialErrorReceivedEventArgs;
+//#else
 using SerialPort = System.IO.Ports.SerialPort;
 using SerialDataReceivedEventArgs = System.IO.Ports.SerialDataReceivedEventArgs;
 using SerialErrorReceivedEventArgs = System.IO.Ports.SerialErrorReceivedEventArgs;
-#endif
+//#endif
 
 namespace Arduino.Firmata.Serial
 {
@@ -60,13 +60,18 @@ namespace Arduino.Firmata.Serial
         /// </summary>
         /// <param name="portName">The port name (e.g. 'COM3')</param>
         /// <param name="baudRate">The baud rate</param>
-        public SerialConnection(string portName, int baudRate)
+        public SerialConnection(string portName, int baudRate) : this(
+            //#if NETSTANDARD
+            //            new SerialPort(portName, baudRate, 8, RJCP.IO.Ports.Parity.None, RJCP.IO.Ports.StopBits.One)
+            //#else
+            new SerialPort(portName, baudRate, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One)
+        //#endif
+        )
+        { }
+        public SerialConnection(SerialPort serial)
         {
-#if NETSTANDARD
-            _serial = new SerialPort(portName, baudRate, 8, RJCP.IO.Ports.Parity.None, RJCP.IO.Ports.StopBits.One);
-#else
-            _serial = new SerialPort(portName, baudRate, System.IO.Ports.Parity.None, 8, System.IO.Ports.StopBits.One);
-#endif
+            _serial = serial;
+
             _serial.ReadTimeout = DefaultTimeoutMs;
             _serial.WriteTimeout = DefaultTimeoutMs;
 
@@ -74,7 +79,6 @@ namespace Arduino.Firmata.Serial
             _serial.ErrorReceived += OnSerialPortErrorReceived;
 
         }
-
         #endregion
 
         #region Public Methods & Properties
@@ -107,9 +111,9 @@ namespace Arduino.Firmata.Serial
                 // its buffer after a Close or directly when Opened.
                 // NOPE: RawDump on Rpi shows that data is correctly received, so no buffers are "remembered".
 
-#if NETSTANDARD
-                _serial.Flush();
-#endif
+                //#if NETSTANDARD
+                //                _serial.Flush();
+                //#endif
                 _serial.DiscardOutBuffer();
                 _serial.DiscardInBuffer();
             }
@@ -129,9 +133,9 @@ namespace Arduino.Firmata.Serial
                 return;
 
             Thread.Sleep(250);
-#if NETSTANDARD
-            _serial.Flush();
-#endif
+            //#if NETSTANDARD
+            //            _serial.Flush();
+            //#endif
             _serial.DiscardInBuffer();
             _serial.Close();
         }
@@ -279,6 +283,10 @@ namespace Arduino.Firmata.Serial
         {
             throw new Exception("串口异常");
         }
+        private static void DebugWriteLine(string format, params object[] args)
+        {
+            //Debug.WriteLine(format, args);
+        }
         private static IDataConnection FindConnection(Func<ArduinoSession, bool> isDeviceAvailable, string[] portNames, SerialBaudRate[] baudRates)
         {
             bool found = false;
@@ -293,7 +301,7 @@ namespace Arduino.Firmata.Serial
                         {
                             using (var session = new ArduinoSession(connection, 100))
                             {
-                                Debug.WriteLine("{0}:{1}; ", portNames[x], (int)rate);
+                                DebugWriteLine("{0}:{1}; ", portNames[x], (int)rate);
 
                                 if (isDeviceAvailable(session))
                                     found = true;
@@ -306,7 +314,7 @@ namespace Arduino.Firmata.Serial
                     catch (UnauthorizedAccessException)
                     {
                         // Port is not available.
-                        Debug.WriteLine("{0} NOT AVAILABLE; ", portNames[x]);
+                        DebugWriteLine("{0} NOT AVAILABLE; ", portNames[x]);
                         break;
                     }
                     catch (TimeoutException)
@@ -315,7 +323,7 @@ namespace Arduino.Firmata.Serial
                     }
                     catch (IOException ex)
                     {
-                        Debug.WriteLine($"HResult 0x{ex.HResult:X} - {ex.Message}");
+                        DebugWriteLine($"HResult 0x{ex.HResult:X} - {ex.Message}");
                     }
                 }
             }
