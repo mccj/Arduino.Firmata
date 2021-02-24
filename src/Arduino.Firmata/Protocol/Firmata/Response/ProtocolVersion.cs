@@ -18,5 +18,13 @@
         {
             return $"V{Major}.{Minor}";
         }
+        public static bool operator ==(ProtocolVersion a, ProtocolVersion b)
+        {
+            return a.Major == b.Major && a.Minor == b.Minor;
+        }
+        public static bool operator !=(ProtocolVersion a, ProtocolVersion b)
+        {
+            return a.Major != b.Major || a.Minor != b.Minor;
+        }
     }
 }
