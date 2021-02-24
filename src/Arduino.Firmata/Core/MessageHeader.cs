@@ -359,6 +359,63 @@ namespace Arduino.Firmata
             //                    throw new NotImplementedException(string.Format(Messages.NotImplementedEx_Command, serialByte));
             //            }
         }
+        public FirmataMessage<T> GetMessageFromQueue<T>(Func<FirmataMessage<T>, bool> messagePredicate) where T : struct
+        {
+            var message = GetMessageFromQueue(firmataMessage =>
+            {
+                //if (firmataMessage.GetType() != typeof(FirmataMessage<GenericResponse<T>>))
+                //    return false;
+                if (firmataMessage is FirmataMessage<T> message)
+                {
+                    return messagePredicate(message);
+                }
+                return false;
+            });
+
+            if (message is FirmataMessage<T> result)
+                return result;
+
+            throw new TimeoutException(string.Format(Messages.TimeoutEx_WaitMessage, typeof(T).Name));
+        }
+
+        public FirmataMessage<GenericResponse<T>> GetMessageFromQueue<T>(byte messageType, byte messageSubType)
+        {
+            var message = GetMessageFromQueue(firmataMessage =>
+            {
+                //if (firmataMessage.GetType() != typeof(FirmataMessage<GenericResponse<T>>))
+                //    return false;
+                if (firmataMessage is FirmataMessage<GenericResponse<T>> message)
+                {
+                    if (message.Value.MessageType == messageType && message.Value.MessageSubType == messageSubType)
+                        return true;
+                }
+                return false;
+            });
+
+            if (message is FirmataMessage<GenericResponse<T>> result)
+                return result;
+
+            throw new TimeoutException(string.Format(Messages.TimeoutEx_WaitMessage, typeof(T).Name));
+        }
+        public FirmataMessage<GenericResponse> GetMessageFromQueue(byte messageType, byte messageSubType)
+        {
+            var message = GetMessageFromQueue(firmataMessage =>
+            {
+                //if (firmataMessage.GetType() != typeof(FirmataMessage<GenericResponse<T>>))
+                //    return false;
+                if (firmataMessage is FirmataMessage<GenericResponse> message)
+                {
+                    if (message.Value.MessageType == messageType && message.Value.MessageSubType == messageSubType)
+                        return true;
+                }
+                return false;
+            });
+
+            if (message is FirmataMessage<GenericResponse> result)
+                return result;
+
+            throw new TimeoutException(string.Format(Messages.TimeoutEx_WaitMessage, typeof(GenericResponse).Name));
+        }
         public FirmataMessage<T> GetMessageFromQueue<T>() where T : struct
         {
             var message = GetMessageFromQueue(firmataMessage => firmataMessage.GetType() == typeof(FirmataMessage<T>));

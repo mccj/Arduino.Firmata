@@ -23,6 +23,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arduino.Firmata.Web", "Ardu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arduino.Firmata.Tcp", "Arduino.Firmata.Tcp\Arduino.Firmata.Tcp.csproj", "{73FECAE8-D532-4217-8F53-D8C125C1225C}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arduino.Firmata.NeoPixel", "Arduino.Firmata.NeoPixel\Arduino.Firmata.NeoPixel.csproj", "{20F3EC01-28C0-4757-9E0D-EEB463AEEC67}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arduino.Firmata.EEPROM", "Arduino.Firmata.EEPROM\Arduino.Firmata.EEPROM.csproj", "{A98B731B-703B-4EEE-AA02-9FF4B6F7BDDA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +61,14 @@ Global
 		{73FECAE8-D532-4217-8F53-D8C125C1225C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{73FECAE8-D532-4217-8F53-D8C125C1225C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{73FECAE8-D532-4217-8F53-D8C125C1225C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20F3EC01-28C0-4757-9E0D-EEB463AEEC67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20F3EC01-28C0-4757-9E0D-EEB463AEEC67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20F3EC01-28C0-4757-9E0D-EEB463AEEC67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20F3EC01-28C0-4757-9E0D-EEB463AEEC67}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A98B731B-703B-4EEE-AA02-9FF4B6F7BDDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A98B731B-703B-4EEE-AA02-9FF4B6F7BDDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A98B731B-703B-4EEE-AA02-9FF4B6F7BDDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A98B731B-703B-4EEE-AA02-9FF4B6F7BDDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

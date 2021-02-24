@@ -52,5 +52,66 @@ namespace Arduino.Firmata
 
             return Convert.ToChar(code | 0x30);
         }
+        public static System.Collections.Generic.IEnumerable<byte> Encoder7Bit(byte[] bytes)
+        {
+            if (bytes == null)
+                throw new ArgumentNullException();
+
+            int previous = 0;
+            int shift = 0;
+
+            foreach (var data in bytes)
+            {
+                if (shift == 0)
+                {
+                    //Firmata.write(data & 0x7f);
+                    yield return (byte)(data & 0x7f);
+                    shift++;
+                    previous = data >> 7;
+                }
+                else
+                {
+                    //Firmata.write(((data << shift) & 0x7f) | previous);
+                    yield return (byte)(((data << shift) & 0x7f) | previous);
+                    if (shift == 6)
+                    {
+                        //Firmata.write(data >> 1);
+                        yield return (byte)(data >> 1);
+                        shift = 0;
+                    }
+                    else
+                    {
+                        shift++;
+                        previous = data >> (8 - shift);
+                    }
+                }
+            }
+            if (shift > 0)
+            {
+                //Firmata.write(previous);
+                yield return (byte)previous;
+            }
+        }
+        public static byte[] Decode7Bit(byte[] inData)
+        {
+            if (inData == null)
+                throw new ArgumentNullException();
+
+            var outBytes = num7BitOutbytes(inData.Length);
+            byte[] outData = new byte[outBytes];
+            for (int i = 0; i < outBytes; i++)
+            {
+                int j = i << 3;
+                int pos = j / 7;
+                byte shift = (byte)(j % 7);
+                outData[i] = (byte)((inData[pos] >> shift) | ((inData[pos + 1] << (7 - shift)) & 0xFF));
+            }
+
+            return outData;
+        }
+        public static int num7BitOutbytes(int a)
+        {
+            return (a * 7) >> 3;
+        }
     }
 }

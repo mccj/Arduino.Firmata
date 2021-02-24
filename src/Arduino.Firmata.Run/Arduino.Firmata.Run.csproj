@@ -9,6 +9,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <ProjectReference Include="..\Arduino.Firmata.EEPROM\Arduino.Firmata.EEPROM.csproj" />
+	  <ProjectReference Include="..\Arduino.Firmata.NeoPixel\Arduino.Firmata.NeoPixel.csproj" />
 	  <ProjectReference Include="..\Arduino.Firmata.Serial\Arduino.Firmata.Serial.csproj" />
 	  <ProjectReference Include="..\Arduino.Firmata.Tcp\Arduino.Firmata.Tcp.csproj" />
 	</ItemGroup>

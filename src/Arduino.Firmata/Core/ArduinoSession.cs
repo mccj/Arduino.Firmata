@@ -832,6 +832,18 @@ namespace Arduino.Firmata
         {
             return messageHeader.GetMessageFromQueue<T>();
         }
+        public FirmataMessage<T> GetMessageFromQueue<T>(Func<FirmataMessage<T>, bool> messagePredicate) where T : struct
+        {
+            return messageHeader.GetMessageFromQueue(messagePredicate);
+        }
+        public FirmataMessage<Protocol.Firmata.GenericResponse<T>> GetMessageFromQueue<T>(byte messageType, byte messageSubType)
+        {
+            return messageHeader.GetMessageFromQueue<T>(messageType, messageSubType);
+        }
+        public FirmataMessage<Protocol.Firmata.GenericResponse> GetMessageFromQueue(byte messageType, byte messageSubType)
+        {
+            return messageHeader.GetMessageFromQueue(messageType, messageSubType);
+        }
         //public object GetMessageFromQueue(FirmataMessage awaitedMessage)
         //{
         //    return messageHeader.GetMessageFromQueue(awaitedMessage);

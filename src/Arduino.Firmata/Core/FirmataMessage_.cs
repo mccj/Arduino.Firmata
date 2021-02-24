@@ -21,7 +21,7 @@ namespace Arduino.Firmata
         /// <summary>
         ///     Gets the specific value delivered by the message.
         /// </summary>
-        public T Value { get; }
+        public T Value { get; } 
 
         /// <inheritdoc />
         public DateTime Time { get; }

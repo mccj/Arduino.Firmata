@@ -64,13 +64,28 @@ namespace Arduino.Firmata
         /// <remarks>
         /// Every character in the string is converted into two 7-bit bytes, starting with the most significant byte.
         /// </remarks>
-        public static byte[] To14BitIso(this string o)
+        public static byte[] To14BitIso(this string o, System.Text.Encoding encoding= null)
         {
             if (o == null)
                 throw new ArgumentNullException();
 
             if (o.Length == 0)
                 return new byte[0];
+
+            if (encoding == null) encoding = System.Text.Encoding.ASCII;
+            return To14BitIso(encoding.GetBytes(o));
+            //byte[] dataBytes = new byte[o.Length * 2];
+
+            //for (int x = 0; x < o.Length; x++)
+            //{
+            //    short c = Convert.ToInt16(o[x]);
+            //    dataBytes[x * 2] = (byte)(c & 0x7F);
+            //    dataBytes[x * 2 + 1] = (byte)((c >> 7) & 0x7F);
+            //}
+            //return dataBytes;
+        }
+        public static byte[] To14BitIso(this byte[] o)
+        {
 
             byte[] dataBytes = new byte[o.Length * 2];
 
