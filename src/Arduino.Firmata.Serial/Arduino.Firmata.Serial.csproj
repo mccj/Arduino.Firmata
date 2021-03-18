@@ -13,7 +13,7 @@ The library implements the serial ASCII, Firmata and I2C protocols, which can be
 
 	<ItemGroup>
 		<!--<PackageReference Include="SerialPortStream" Version="2.2.2" Condition="'$(TargetFramework)'=='netstandard2.0'" />-->
-		<PackageReference Include="System.IO.Ports" Version="5.0.0" />
+		<PackageReference Include="System.IO.Ports" Version="5.0.1" />
 	</ItemGroup>
 
 	<ItemGroup>
