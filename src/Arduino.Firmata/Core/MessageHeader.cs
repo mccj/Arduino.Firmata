@@ -313,12 +313,12 @@ namespace Arduino.Firmata
                     Monitor.Exit(_receivedStringQueue);
             }
         }
-
+        private FirmataMessageHeader messageHeader = new FirmataMessageHeader();
         private void ProcessCommand(int serialByte)
         {
             MessageBuffer[0] = serialByte;
             MessageBufferIndex = 1;
-            FirmataMessageHeader.Header(serialByte, this);
+            messageHeader.Header(serialByte, this);
 
 
             //MessageHeader header = (MessageHeader)(serialByte & 0xF0);
@@ -432,8 +432,8 @@ namespace Arduino.Firmata
             try
             {
                 Monitor.TryEnter(_receivedMessageList, _messageTimeout, ref lockTaken);
-
-                while (lockTaken)
+                var lockWait = lockTaken;
+                while (lockWait)
                 {
                     if (_receivedMessageList.Count > 0)
                     {
@@ -454,7 +454,7 @@ namespace Arduino.Firmata
                         }
                     }
 
-                    lockTaken = Monitor.Wait(_receivedMessageList, _messageTimeout);
+                    lockWait = Monitor.Wait(_receivedMessageList, _messageTimeout);
                 }
 
                 return null;
@@ -484,8 +484,8 @@ namespace Arduino.Firmata
             try
             {
                 Monitor.TryEnter(_receivedStringQueue, _messageTimeout, ref lockTaken);
-
-                while (lockTaken)
+                var lockWait = lockTaken;
+                while (lockWait)
                 {
                     if (_receivedStringQueue.Count > 0)
                     {
@@ -494,7 +494,7 @@ namespace Arduino.Firmata
                         return message;
                     }
 
-                    lockTaken = Monitor.Wait(_receivedStringQueue, _messageTimeout);
+                    lockWait = Monitor.Wait(_receivedStringQueue, _messageTimeout);
                 }
 
                 throw new TimeoutException(string.Format(Messages.TimeoutEx_WaitStringRequest, request.Mode));

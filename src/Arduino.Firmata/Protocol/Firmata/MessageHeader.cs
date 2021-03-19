@@ -42,8 +42,8 @@ namespace Arduino.Firmata.Protocol.Firmata
             SystemExtension = 0xF0,
             ProtocolVersion = 0xF9
         }
-        private static MessageHeader _messageHeader;
-        public static void Header(int serialByte, MessageHeader messageHeader)
+        private MessageHeader _messageHeader;
+        public void Header(int serialByte, MessageHeader messageHeader)
         {
             _messageHeader = messageHeader;
 
@@ -108,7 +108,7 @@ namespace Arduino.Firmata.Protocol.Firmata
             //Debug.Write(messageHeader._processMessage);
 #endif
         }
-        private static void ProcessAnalogStateMessage(int messageByte)
+        private void ProcessAnalogStateMessage(int messageByte)
         {
             if (_messageHeader.MessageBufferIndex < 2)
             {
@@ -134,7 +134,7 @@ namespace Arduino.Firmata.Protocol.Firmata
             }
         }
 
-        private static void ProcessDigitalStateMessage(int messageByte)
+        private void ProcessDigitalStateMessage(int messageByte)
         {
             if (_messageHeader.MessageBufferIndex < 2)
             {
@@ -160,7 +160,7 @@ namespace Arduino.Firmata.Protocol.Firmata
             }
         }
 
-        private static void ProcessProtocolVersionMessage(int messageByte)
+        private void ProcessProtocolVersionMessage(int messageByte)
         {
             if (_messageHeader.MessageBufferIndex < 2)
             {
@@ -177,7 +177,7 @@ namespace Arduino.Firmata.Protocol.Firmata
             }
         }
 
-        private static void ProcessSysExMessage(int messageByte)
+        private void ProcessSysExMessage(int messageByte)
         {
             if (messageByte != Utility.SysExEnd)
             {
@@ -232,7 +232,7 @@ namespace Arduino.Firmata.Protocol.Firmata
         }
 
 
-        private static void DeliverMessage(IFirmataMessage message)
+        private void DeliverMessage(IFirmataMessage message)
         {
             _messageHeader._processMessage = null;
 
